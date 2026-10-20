@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<style>
+  /* Stories Nexo — "Indico x Não indico" para iniciantes. 8 telas de 6 s (capa 5 s), 1080×1920.
+     Zonas seguras do Stories: nada importante acima de y=250 nem abaixo de y=1600. */
+  @font-face { font-family: "Poppins"; src: url("fonts/poppins-500.woff2") format("woff2"); font-weight: 500; font-display: block; }
+  @font-face { font-family: "Poppins"; src: url("fonts/poppins-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+  @font-face { font-family: "Poppins"; src: url("fonts/poppins-800.woff2") format("woff2"); font-weight: 800; font-display: block; }
+  @font-face { font-family: "Poppins"; src: url("fonts/poppins-300-italic.woff2") format("woff2"); font-weight: 300; font-style: italic; font-display: block; }
+
+  :root { --accent: #4d7cff; --yes: #34c759; --no: #ff453a; --bg: #070a14; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); font-family: "Poppins", sans-serif; color: #fff; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+  #grid { position: absolute; inset: 0;
+          background-image: linear-gradient(rgba(255,255,255,0.05) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.05) 2px, transparent 2px);
+          background-size: 72px 72px; }
+  #glow { position: absolute; left: -300px; top: 300px; width: 1680px; height: 1400px; border-radius: 50%;
+          background: radial-gradient(closest-side, rgba(77,124,255,0.35), rgba(77,124,255,0)); }
+  .tint { position: absolute; inset: 0; opacity: 0; }
+  .tint.yes { background: radial-gradient(ellipse at 50% 70%, rgba(52,199,89,0.28), rgba(52,199,89,0) 65%); }
+  .tint.no { background: radial-gradient(ellipse at 50% 70%, rgba(255,69,58,0.28), rgba(255,69,58,0) 65%); }
+
+  #logo { position: absolute; left: 50%; top: 262px; width: 170px; margin-left: -85px; opacity: 0.9; }
+  .slide { position: absolute; inset: 0; opacity: 0; }
+  .w { display: inline-block; white-space: pre; }
+
+  .tag { position: absolute; left: 90px; top: 420px; display: inline-flex; align-items: center; gap: 14px; padding: 10px 24px 12px;
+         border: 3px dashed rgba(255,255,255,0.8); border-radius: 20px; font-weight: 800; font-size: 34px; letter-spacing: 1px; }
+  .tag .n { color: var(--accent); }
+  .lead { font-weight: 300; font-style: italic; font-size: 46px; letter-spacing: -0.5px; opacity: 0.9; }
+  .sit { position: absolute; left: 90px; top: 540px; width: 900px; }
+  .sit .big { font-weight: 800; font-size: 96px; line-height: 1.04; letter-spacing: -4px; margin-top: 10px; }
+  .sit .big .acc { color: var(--accent); }
+
+  .stamp { position: absolute; left: 90px; top: 1060px; display: inline-flex; align-items: center; gap: 26px; padding: 22px 44px 26px 26px;
+           border-radius: 34px; font-weight: 800; font-size: 82px; letter-spacing: -2px; transform-origin: 30% 50%; }
+  .stamp .ic { width: 110px; height: 110px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #fff; }
+  .stamp.yes { background: var(--yes); box-shadow: 0 0 0 6px rgba(52,199,89,0.25), 0 24px 60px rgba(52,199,89,0.35); }
+  .stamp.no { background: var(--no); box-shadow: 0 0 0 6px rgba(255,69,58,0.25), 0 24px 60px rgba(255,69,58,0.35); }
+
+  .why { position: absolute; left: 90px; top: 1290px; width: 900px; }
+  .why .t { font-weight: 700; font-size: 54px; line-height: 1.15; letter-spacing: -1.5px; margin-top: 8px; }
+  .why .t b { color: var(--accent); font-weight: 800; }
+
+  /* capa */
+  .cover-yes, .cover-no { display: inline-flex; align-items: center; gap: 24px; padding: 20px 44px 24px 24px; border-radius: 34px; font-weight: 800; font-size: 104px; letter-spacing: -3px; }
+  .cover-yes { background: var(--yes); }
+  .cover-no { background: var(--no); }
+  .x { font-weight: 300; font-style: italic; font-size: 90px; opacity: 0.9; }
+  .dash { display: inline-flex; align-items: center; gap: 16px; padding: 14px 30px 18px; border: 3.5px dashed rgba(255,255,255,0.9); border-radius: 24px;
+          background: rgba(255,255,255,0.08); font-weight: 800; font-size: 50px; letter-spacing: -1.5px; }
+  .spk { position: absolute; width: 54px; height: 54px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.85)); }
+</style>
+</head>
+<body>
+<div id="stage" data-composition-id="stories" data-start="0" data-duration="47" data-fps="30" data-width="1080" data-height="1920">
+  <div id="grid"></div>
+  <div id="glow"></div>
+  <div class="tint yes" id="tint-yes"></div>
+  <div class="tint no" id="tint-no"></div>
+
+  <div class="clip" id="fx" data-start="0" data-duration="47" data-track-index="2">
+    <svg id="logo" viewBox="0 0 230 90"><g fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 72 V48 a20 20 0 0 1 40 0 V72" /><path d="M72 52 H112 A20 20 0 0 0 72 52 A20 20 0 0 0 92 72 H110" /><path d="M128 36 L140 48 M128 68 L140 56 M152 56 L164 68" /><circle cx="196" cy="52" r="20" /></g><path d="M152 48 L164 36" fill="none" stroke="#4d7cff" stroke-width="9" stroke-linecap="round" /></svg>
+  </div>
+
+  <!-- SFX:BEGIN -->
+  <audio id="sfx00" src="sfx/impact-bass-1.mp3" data-start="0.6000" data-duration="2.12" data-track-index="10" data-volume="0.35"></audio>
+  <audio id="sfx01" src="sfx/impact-bass-1.mp3" data-start="1.4000" data-duration="2.12" data-track-index="11" data-volume="0.35"></audio>
+  <audio id="sfx02" src="sfx/sparkle.mp3" data-start="1.9000" data-duration="1.80" data-track-index="12" data-volume="0.3"></audio>
+  <audio id="sfx03" src="sfx/pop.mp3" data-start="2.2000" data-duration="0.72" data-track-index="13" data-volume="0.3"></audio>
+  <audio id="sfx04" src="sfx/whoosh.mp3" data-start="5.0000" data-duration="0.57" data-track-index="14" data-volume="0.3"></audio>
+  <audio id="sfx05" src="sfx/click.mp3" data-start="6.7667" data-duration="0.37" data-track-index="15" data-volume="0.45"></audio>
+  <audio id="sfx06" src="sfx/impact-bass-1.mp3" data-start="6.7667" data-duration="2.12" data-track-index="10" data-volume="0.4"></audio>
+  <audio id="sfx07" src="sfx/pop.mp3" data-start="7.5333" data-duration="0.72" data-track-index="11" data-volume="0.25"></audio>
+  <audio id="sfx08" src="sfx/whoosh.mp3" data-start="11.0000" data-duration="0.57" data-track-index="12" data-volume="0.3"></audio>
+  <audio id="sfx09" src="sfx/chime.mp3" data-start="12.4000" data-duration="2.50" data-track-index="13" data-volume="0.35"></audio>
+  <audio id="sfx10" src="sfx/impact-bass-1.mp3" data-start="12.4000" data-duration="2.12" data-track-index="14" data-volume="0.4"></audio>
+  <audio id="sfx11" src="sfx/pop.mp3" data-start="13.1667" data-duration="0.72" data-track-index="15" data-volume="0.25"></audio>
+  <audio id="sfx12" src="sfx/whoosh.mp3" data-start="17.0000" data-duration="0.57" data-track-index="10" data-volume="0.3"></audio>
+  <audio id="sfx13" src="sfx/click.mp3" data-start="18.6000" data-duration="0.37" data-track-index="11" data-volume="0.45"></audio>
+  <audio id="sfx14" src="sfx/impact-bass-1.mp3" data-start="18.6000" data-duration="2.12" data-track-index="12" data-volume="0.4"></audio>
+  <audio id="sfx15" src="sfx/pop.mp3" data-start="19.3333" data-duration="0.72" data-track-index="13" data-volume="0.25"></audio>
+  <audio id="sfx16" src="sfx/whoosh.mp3" data-start="23.0000" data-duration="0.57" data-track-index="14" data-volume="0.3"></audio>
+  <audio id="sfx17" src="sfx/chime.mp3" data-start="24.6000" data-duration="2.50" data-track-index="15" data-volume="0.35"></audio>
+  <audio id="sfx18" src="sfx/impact-bass-1.mp3" data-start="24.6000" data-duration="2.12" data-track-index="10" data-volume="0.4"></audio>
+  <audio id="sfx19" src="sfx/pop.mp3" data-start="25.3333" data-duration="0.72" data-track-index="11" data-volume="0.25"></audio>
+  <audio id="sfx20" src="sfx/whoosh.mp3" data-start="29.0000" data-duration="0.57" data-track-index="12" data-volume="0.3"></audio>
+  <audio id="sfx21" src="sfx/click.mp3" data-start="30.5000" data-duration="0.37" data-track-index="13" data-volume="0.45"></audio>
+  <audio id="sfx22" src="sfx/impact-bass-1.mp3" data-start="30.5000" data-duration="2.12" data-track-index="14" data-volume="0.4"></audio>
+  <audio id="sfx23" src="sfx/pop.mp3" data-start="31.2667" data-duration="0.72" data-track-index="15" data-volume="0.25"></audio>
+  <audio id="sfx24" src="sfx/whoosh.mp3" data-start="35.0000" data-duration="0.57" data-track-index="10" data-volume="0.3"></audio>
+  <audio id="sfx25" src="sfx/click.mp3" data-start="36.5000" data-duration="0.37" data-track-index="11" data-volume="0.45"></audio>
+  <audio id="sfx26" src="sfx/impact-bass-1.mp3" data-start="36.5000" data-duration="2.12" data-track-index="12" data-volume="0.4"></audio>
+  <audio id="sfx27" src="sfx/pop.mp3" data-start="37.2667" data-duration="0.72" data-track-index="13" data-volume="0.25"></audio>
+  <audio id="sfx28" src="sfx/whoosh.mp3" data-start="41.0000" data-duration="0.57" data-track-index="14" data-volume="0.3"></audio>
+  <audio id="sfx29" src="sfx/impact-bass-1.mp3" data-start="41.6000" data-duration="2.12" data-track-index="15" data-volume="0.35"></audio>
+  <audio id="sfx30" src="sfx/pop.mp3" data-start="42.2000" data-duration="0.72" data-track-index="10" data-volume="0.3"></audio>
+  <!-- SFX:END -->
+
+  <script src="vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      const q = (s) => Math.round(s * 30) / 30;
+      const fx = document.getElementById("fx");
+      const el = (html) => { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstChild; };
+      const STAR = '<svg viewBox="0 0 24 24" width="100%" height="100%"><path fill="#fff" d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z"/></svg>';
+      const OK = '<svg width="70" height="70" viewBox="0 0 64 64"><path d="M14 33 L27 46 L50 20" fill="none" stroke="#34c759" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      const NO = '<svg width="64" height="64" viewBox="0 0 64 64"><path d="M16 16 L48 48 M48 16 L16 48" fill="none" stroke="#ff453a" stroke-width="9" stroke-linecap="round"/></svg>';
+      const BIN = (s) => { const b = el(s); fx.appendChild(b); return b; };
+      const IN = (sel, t, o = {}) => tl.fromTo(sel, { opacity: 0, filter: "blur(16px)", scale: o.scale ?? 1.12, y: o.y ?? 0 },
+        { opacity: 1, filter: "blur(0px)", scale: 1, y: 0, duration: o.d ?? 0.3, ease: "power3.out", immediateRender: false }, q(t));
+      const words = (txt) => txt.split(" ").map((w) => w.startsWith("*") ? '<span class="w acc">' + w.slice(1) + ' </span>' : '<span class="w">' + w + ' </span>').join("");
+
+      // ── conteúdo (situações comuns de quem está começando) ──
+      const SLIDES = [
+        { yes: false, lead: "começar comprando", big: 'um kit com *10 *dispositivos de uma vez',
+          why: 'Comece com <b>1 ou 2</b>, aprenda o app e só depois expanda.' },
+        { yes: true, lead: "primeiro dispositivo:", big: '*lâmpada ou *tomada inteligente',
+          why: 'É barato, <b>não precisa de obra</b> e você instala em minutos.' },
+        { yes: false, lead: "cada aparelho de uma marca,", big: 'cada um com o *seu *app',
+          why: 'Vira bagunça. Prefira <b>um ecossistema</b> ou o selo <b>Matter</b>.' },
+        { yes: true, lead: "usar desde o início um", big: 'assistente de voz *Alexa ou *Google',
+          why: 'Junta tudo num lugar só e <b>controla por voz</b>.' },
+        { yes: false, lead: "trocar o interruptor", big: 'mexendo na *fiação sem saber',
+          why: 'Elétrica não é teste: <b>chame um eletricista</b>.' },
+        { yes: false, lead: "comprar sem olhar se funciona", big: 'no *Wi-Fi da sua casa',
+          why: 'A maioria só pega em <b>2,4 GHz</b>. Confira antes de comprar.' },
+      ];
+      const COVER = 5, DUR = 6;
+      const starts = [0]; for (let i = 0; i < SLIDES.length + 1; i++) starts.push(COVER + i * DUR);
+      const END = starts[starts.length - 1] + DUR;
+      const sfx = [];
+      const swapIn = (s, t) => { tl.set(s, { opacity: 1 }, q(t)); tl.fromTo(s, { x: 120, filter: "blur(10px)" }, { x: 0, filter: "blur(0px)", duration: 0.35, ease: "power3.out", immediateRender: false }, q(t)); };
+      const swapOut = (s, t) => tl.to(s, { opacity: 0, x: -120, filter: "blur(10px)", duration: 0.25, ease: "power2.in" }, q(t - 0.25));
+      const hidden = [];
+
+      // ── capa ──
+      (function () {
+        const c = BIN('<div class="slide" id="cover" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px;text-align:center">'
+          + '<div class="lead" id="cv-l" style="font-size:52px">começando na automação?</div>'
+          + '<div class="cover-yes" id="cv-y"><div class="stamp-ic" style="width:110px;height:110px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center">' + OK + '</div>INDICO</div>'
+          + '<div class="x" id="cv-x">x</div>'
+          + '<div class="cover-no" id="cv-n"><div style="width:110px;height:110px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center">' + NO + '</div>NÃO INDICO</div>'
+          + '<div class="dash" id="cv-d" style="margin-top:30px">6 situações pra quem tá começando</div>'
+          + '<div class="spk" style="left:150px;top:640px">' + STAR + '</div><div class="spk" style="left:880px;top:1250px">' + STAR + '</div></div>');
+        tl.set(c, { opacity: 1 }, 0);
+        ["#cv-l", "#cv-y", "#cv-x", "#cv-n", "#cv-d"].forEach((s) => hidden.push(s));
+        IN("#cv-l", 0.2); IN("#cv-y", 0.6, { scale: 1.6, d: 0.35 }); IN("#cv-x", 1.1); IN("#cv-n", 1.4, { scale: 1.6, d: 0.35 }); IN("#cv-d", 2.2, { scale: 1 });
+        tl.fromTo("#cover .spk", { opacity: 0, scale: 0.2, rotation: -90 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.4, stagger: 0.15, ease: "back.out(3)" }, q(1.9));
+        swapOut(c, COVER);
+        sfx.push([0.6, "impact-bass-1", 0.35], [1.4, "impact-bass-1", 0.35], [1.9, "sparkle", 0.3], [2.2, "pop", 0.3]);
+      })();
+
+      // ── situações ──
+      SLIDES.forEach((d, i) => {
+        const t0 = starts[i + 1];
+        const id = "s" + i;
+        const s = BIN('<div class="slide" id="' + id + '">'
+          + '<div class="tag" id="' + id + '-tag">SITUAÇÃO <span class="n">0' + (i + 1) + '</span>/06</div>'
+          + '<div class="sit"><div class="lead" id="' + id + '-lead">' + d.lead + '</div><div class="big" id="' + id + '-big">' + words(d.big) + '</div></div>'
+          + '<div class="stamp ' + (d.yes ? "yes" : "no") + '" id="' + id + '-st"><div class="ic">' + (d.yes ? OK : NO) + '</div>' + (d.yes ? "INDICO" : "NÃO INDICO") + '</div>'
+          + '<div class="why" id="' + id + '-why"><div class="lead" style="font-size:40px">por quê?</div><div class="t">' + d.why + '</div></div></div>');
+        // words of the big line: keep inner spans (acc spans contain words too)
+        swapIn(s, t0);
+        hidden.push("#" + id + "-lead", "#" + id + "-st", "#" + id + "-why");
+        IN("#" + id + "-lead", t0 + 0.25);
+        const ws = s.querySelectorAll("#" + id + "-big .w");
+        ws.forEach((w) => hidden.push(w));
+        ws.forEach((w, k) => IN(w, t0 + 0.55 + k * 0.09, { scale: 1.2, d: 0.26 }));
+        const tStamp = t0 + 0.55 + ws.length * 0.09 + 0.45;
+        tl.fromTo("#" + id + "-st", { opacity: 0, scale: 2.2, rotation: -14, filter: "blur(10px)" },
+          { opacity: 1, scale: 1, rotation: -4, filter: "blur(0px)", duration: 0.32, ease: "back.out(2.2)", immediateRender: false }, q(tStamp));
+        tl.fromTo("#stage", { x: 0 }, { x: 10, duration: 0.05, yoyo: true, repeat: 3, ease: "none", immediateRender: false }, q(tStamp + 0.3));
+        const tint = d.yes ? "#tint-yes" : "#tint-no";
+        tl.to(tint, { opacity: 1, duration: 0.3 }, q(tStamp)); tl.to(tint, { opacity: 0, duration: 0.25 }, q(t0 + DUR - 0.25));
+        IN("#" + id + "-why", tStamp + 0.8, { scale: 1, y: 20 });
+        swapOut(s, t0 + DUR);
+        sfx.push([t0, "whoosh", 0.3], [tStamp + 0.05, "impact-bass-1", 0.4], [tStamp + 0.05, d.yes ? "chime" : "click", d.yes ? 0.35 : 0.45], [tStamp + 0.8, "pop", 0.25]);
+      });
+
+      // ── fechamento: espaço para enquete/caixa de perguntas ──
+      (function () {
+        const t0 = starts[SLIDES.length + 1];
+        const c = BIN('<div class="slide" id="cta" style="display:flex;flex-direction:column;align-items:center;text-align:center">'
+          + '<div class="lead" id="ct-l" style="margin-top:470px;font-size:52px">e aí, qual você</div>'
+          + '<div id="ct-b" style="font-weight:800;font-size:150px;line-height:1;letter-spacing:-6px">indica<span style="color:var(--accent)">?</span></div>'
+          + '<div class="dash" id="ct-box" style="margin-top:60px;width:820px;height:380px;justify-content:center;flex-direction:column;gap:10px;font-size:40px;font-weight:700;opacity:0.9">'
+          + '<span style="font-size:70px">👇</span>responde aqui</div>'
+          + '<div class="lead" id="ct-f" style="margin-top:60px;font-size:42px">segue a <b style="font-style:normal;font-weight:800">Nexo</b> pra mais dicas</div></div>');
+        swapIn(c, t0);
+        ["#ct-l", "#ct-b", "#ct-box", "#ct-f"].forEach((s) => hidden.push(s));
+        IN("#ct-l", t0 + 0.3); IN("#ct-b", t0 + 0.6, { scale: 1.5, d: 0.35 }); IN("#ct-box", t0 + 1.2, { scale: 0.9 }); IN("#ct-f", t0 + 1.8, { scale: 1 });
+        tl.fromTo("#ct-box", { y: 0 }, { y: -12, duration: 0.5, yoyo: true, repeat: 5, ease: "sine.inOut", immediateRender: false }, q(t0 + 1.6));
+        sfx.push([t0, "whoosh", 0.3], [t0 + 0.6, "impact-bass-1", 0.35], [t0 + 1.2, "pop", 0.3]);
+      })();
+
+      tl.fromTo("#logo", { opacity: 0 }, { opacity: 0.9, duration: 0.5 }, 0.1);
+      gsap.set(hidden, { opacity: 0 });
+      tl.set({}, {}, END);
+      window.__SFX = sfx; window.__END = END; window.__STARTS = starts;
+      window.__timelines = window.__timelines || {};
+      window.__timelines["stories"] = tl;
+    })();
+  </script>
+</div>
+</body>
+</html>

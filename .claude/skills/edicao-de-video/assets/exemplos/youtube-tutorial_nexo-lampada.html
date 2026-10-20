@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<style>
+  /* Tutorial Nexo — tipografia no estilo das referências (Eidryan / Thiago / Mateus Dias),
+     mesma linguagem do desafio-dia09/hf-tipo, adaptada para 16:9. */
+  @font-face { font-family: "Poppins"; src: url("fonts/poppins-500.woff2") format("woff2"); font-weight: 500; font-display: block; }
+  @font-face { font-family: "Poppins"; src: url("fonts/poppins-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+  @font-face { font-family: "Poppins"; src: url("fonts/poppins-800.woff2") format("woff2"); font-weight: 800; font-display: block; }
+  @font-face { font-family: "Poppins"; src: url("fonts/poppins-300-italic.woff2") format("woff2"); font-weight: 300; font-style: italic; font-display: block; }
+  @font-face { font-family: "Poppins"; src: url("fonts/poppins-900-italic.woff2") format("woff2"); font-weight: 900; font-style: italic; font-display: block; }
+
+  :root { --accent: #4d7cff; --ink: #0d1220; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #000; font-family: "Poppins", sans-serif; }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #000; }
+  #blurwrap { position: absolute; inset: 0; }
+  #bg-video, #bg-video-2 { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; }
+  #shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0,0,0,0.42), rgba(0,0,0,0.12) 45%, rgba(0,0,0,0) 70%), linear-gradient(to top, rgba(0,0,0,0.45), rgba(0,0,0,0) 32%); pointer-events: none; }
+  #dim { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.55), rgba(0,0,0,0.92)); opacity: 0; pointer-events: none; }
+
+  #fx { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; pointer-events: none; color: #fff; }
+  .blk { position: absolute; opacity: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+  .blk.ctr { align-items: center; text-align: center; }
+  .w { display: inline-block; white-space: pre; }
+
+  .lead { font-weight: 300; font-style: italic; font-size: 40px; letter-spacing: -0.5px; text-shadow: 0 3px 12px rgba(0,0,0,0.6); white-space: nowrap; }
+  .bold { font-weight: 800; font-size: 92px; line-height: 1.02; letter-spacing: -3.5px; text-shadow: 0 6px 22px rgba(0,0,0,0.5); white-space: nowrap; }
+  .glow { font-weight: 800; font-size: 104px; line-height: 0.98; letter-spacing: -2px; text-transform: uppercase; white-space: nowrap;
+          text-shadow: 0 0 26px rgba(255,255,255,0.5), 0 0 6px rgba(255,255,255,0.35), 0 8px 26px rgba(0,0,0,0.45); }
+  .acc { color: var(--accent); }
+  .glow .acc { text-shadow: 0 0 30px rgba(77,124,255,0.75), 0 8px 26px rgba(0,0,0,0.45); }
+  .pill { display: inline-flex; align-items: center; gap: 16px; padding: 14px 30px 16px; border-radius: 18px; background: #f3f4f7; color: #23262e; font-weight: 700; font-size: 40px; letter-spacing: -1px;
+          box-shadow: 0 6px 0 #b9bdc8, 0 16px 30px rgba(0,0,0,0.38); white-space: nowrap; }
+  .pill svg { flex: none; }
+  .dash { display: inline-flex; align-items: center; gap: 16px; padding: 12px 30px 16px; border: 3.5px dashed rgba(255,255,255,0.9); border-radius: 22px; background: rgba(255,255,255,0.12);
+          font-weight: 800; font-size: 56px; letter-spacing: -2px; white-space: nowrap; text-shadow: 0 4px 14px rgba(0,0,0,0.4); }
+  .bar { display: inline-flex; align-items: center; gap: 22px; padding: 18px 30px; border-radius: 20px; background: rgba(13,18,32,0.94);
+         font-weight: 700; font-size: 50px; letter-spacing: -1.5px; box-shadow: 0 16px 40px rgba(0,0,0,0.4); white-space: nowrap; }
+  .ok { flex: none; }
+  .spk { position: absolute; width: 46px; height: 46px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.85)); }
+  .cell { width: 150px; height: 150px; border-radius: 12px; background: #222; display: flex; align-items: center; justify-content: center;
+          font-weight: 800; font-size: 96px; letter-spacing: -3px; color: #fff; box-shadow: inset 0 -12px 20px rgba(0,0,0,0.45); }
+  .cell.on { color: var(--accent); box-shadow: inset 0 0 0 7px var(--accent); background: #10172e; }
+
+  /* full-screen card (ref. Mateus Dias) */
+  .card { position: absolute; inset: 0; background: var(--accent); opacity: 0; display: flex; align-items: center; justify-content: center;
+          background-image: linear-gradient(rgba(255,255,255,0.08) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.08) 2px, transparent 2px);
+          background-size: 72px 72px; }
+
+  /* step chip + speed badge + watermark */
+  .chip { position: absolute; left: 64px; top: 56px; display: inline-flex; align-items: center; gap: 16px; padding: 10px 26px 12px 12px; border: 3px dashed rgba(255,255,255,0.85);
+          border-radius: 22px; background: rgba(0,0,0,0.38); font-weight: 800; font-size: 36px; letter-spacing: -1px; opacity: 0; white-space: nowrap; }
+  .chip .n { width: 50px; height: 50px; border-radius: 14px; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 30px; }
+  .speed { position: absolute; right: 64px; top: 56px; display: inline-flex; align-items: center; gap: 10px; padding: 8px 24px 12px; border: 3px dashed rgba(255,255,255,0.85);
+           border-radius: 22px; background: rgba(0,0,0,0.38); font-weight: 800; font-size: 40px; letter-spacing: -1px; opacity: 0; }
+  #wm { position: absolute; right: 54px; bottom: 40px; width: 120px; opacity: 0; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.35)); }
+
+  #end { position: absolute; inset: 0; color: #fff; background: #070a14; opacity: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 30px;
+         background-image: linear-gradient(rgba(255,255,255,0.05) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.05) 2px, transparent 2px); background-size: 72px 72px; }
+
+  #captions { position: absolute; inset: 0; pointer-events: none; }
+  .cap { position: absolute; left: 0; width: 1920px; top: 930px; text-align: center; opacity: 0; white-space: nowrap;
+         font-weight: 700; font-size: 54px; letter-spacing: -1.5px; line-height: 1; color: #fff;
+         text-shadow: 0 4px 18px rgba(0,0,0,0.7), 0 2px 4px rgba(0,0,0,0.55); }
+  .cap .cw { display: inline-block; white-space: pre; }
+</style>
+</head>
+<body>
+<div id="stage" data-composition-id="youtube" data-start="0" data-duration="114.8733" data-fps="30" data-width="1920" data-height="1080">
+
+  <div id="blurwrap">
+    <!-- corte base + vinheta da Nexo (24,0–28,6 s) montados num arquivo contínuo para manter áudio e vídeo amarrados -->
+    <video id="bg-video" src="base-com-vinheta.mp4" playsinline data-has-audio="true" data-start="0" data-duration="111.3333" data-track-index="1"></video>
+  </div>
+  <div id="shade"></div>
+  <div id="dim"></div>
+
+  <div class="clip" id="fx" data-start="0" data-duration="114.8733" data-track-index="2"></div>
+
+  <div id="end" class="clip" data-start="111.3333" data-duration="3.54" data-track-index="5">
+    <svg id="end-logo" width="560" height="220" viewBox="0 0 230 90">
+      <g class="end-draw" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 72 V48 a20 20 0 0 1 40 0 V72" /><path d="M72 52 H112 A20 20 0 0 0 72 52 A20 20 0 0 0 92 72 H110" />
+        <path d="M128 36 L140 48 M128 68 L140 56 M152 56 L164 68" /><circle cx="196" cy="52" r="20" />
+      </g>
+      <path id="end-blue" d="M152 48 L164 36" fill="none" stroke="#4d7cff" stroke-width="8" stroke-linecap="round" />
+    </svg>
+    <div class="lead" id="end-tag" style="font-size:44px">automação faça você mesmo</div>
+    <div id="end-btn" style="display:inline-flex;align-items:center;gap:16px;padding:20px 52px 24px;border-radius:60px;background:var(--accent);font-weight:800;font-size:52px;letter-spacing:-1.5px;color:#fff;box-shadow:0 16px 40px rgba(0,0,0,0.45)">+ inscreva-se</div>
+  </div>
+
+  <div id="captions"></div>
+
+  <!-- MUSIC -->
+  <audio id="bgm" src="music/bgm.wav" data-start="0" data-duration="23.9333" data-media-start="0" data-track-index="9" data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0.0,"v":0.08},{"t":23.633,"v":0.08},{"t":23.933,"v":0.0}]}]}'></audio>
+  <audio id="bgm-2" src="music/bgm.wav" data-start="28.5333" data-duration="86.34" data-media-start="23.9333" data-track-index="9" data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0.0,"v":0.0},{"t":0.4,"v":0.08},{"t":8.147,"v":0.08},{"t":8.497,"v":0.28},{"t":9.424,"v":0.28},{"t":9.774,"v":0.08},{"t":14.507,"v":0.08},{"t":14.857,"v":0.28},{"t":16.41,"v":0.28},{"t":16.76,"v":0.08},{"t":29.854,"v":0.08},{"t":30.204,"v":0.28},{"t":30.437,"v":0.28},{"t":30.787,"v":0.08},{"t":40.794,"v":0.08},{"t":41.144,"v":0.28},{"t":41.444,"v":0.28},{"t":41.794,"v":0.08},{"t":68.347,"v":0.08},{"t":68.697,"v":0.28},{"t":72.617,"v":0.28},{"t":72.967,"v":0.08},{"t":82.75,"v":0.08},{"t":83.1,"v":0.35},{"t":86.34,"v":0.35}]}]}'></audio>
+  <!-- SFX:BEGIN -->
+  <audio id="sfx00" src="sfx/pop.mp3" data-start="1.4333" data-duration="0.72" data-track-index="10" data-volume="0.25"></audio>
+  <audio id="sfx01" src="sfx/whoosh-short.mp3" data-start="4.0333" data-duration="0.57" data-track-index="11" data-volume="0.3"></audio>
+  <audio id="sfx02" src="sfx/whoosh-short.mp3" data-start="7.8000" data-duration="0.57" data-track-index="12" data-volume="0.3"></audio>
+  <audio id="sfx03" src="sfx/pop.mp3" data-start="10.8333" data-duration="0.72" data-track-index="13" data-volume="0.3"></audio>
+  <audio id="sfx04" src="sfx/impact-bass-1.mp3" data-start="11.3667" data-duration="2.12" data-track-index="14" data-volume="0.4"></audio>
+  <audio id="sfx05" src="sfx/sparkle.mp3" data-start="11.9667" data-duration="1.80" data-track-index="15" data-volume="0.3"></audio>
+  <audio id="sfx06" src="sfx/pop.mp3" data-start="14.2333" data-duration="0.72" data-track-index="10" data-volume="0.3"></audio>
+  <audio id="sfx07" src="sfx/pop.mp3" data-start="15.7000" data-duration="0.72" data-track-index="11" data-volume="0.3"></audio>
+  <audio id="sfx08" src="sfx/pop.mp3" data-start="19.0667" data-duration="0.72" data-track-index="12" data-volume="0.3"></audio>
+  <audio id="sfx09" src="sfx/whoosh-short.mp3" data-start="20.3667" data-duration="0.57" data-track-index="13" data-volume="0.2"></audio>
+  <audio id="sfx10" src="sfx/click-soft.mp3" data-start="21.9333" data-duration="0.37" data-track-index="14" data-volume="0.25"></audio>
+  <audio id="sfx11" src="sfx/click-soft.mp3" data-start="22.2333" data-duration="0.37" data-track-index="15" data-volume="0.25"></audio>
+  <audio id="sfx12" src="sfx/click-soft.mp3" data-start="22.4667" data-duration="0.37" data-track-index="10" data-volume="0.25"></audio>
+  <audio id="sfx13" src="sfx/whoosh.mp3" data-start="22.9333" data-duration="0.57" data-track-index="11" data-volume="0.35"></audio>
+  <audio id="sfx14" src="sfx/whoosh.mp3" data-start="29.3333" data-duration="0.57" data-track-index="12" data-volume="0.35"></audio>
+  <audio id="sfx15" src="sfx/impact-bass-1.mp3" data-start="29.3667" data-duration="2.12" data-track-index="13" data-volume="0.3"></audio>
+  <audio id="sfx16" src="sfx/click.mp3" data-start="33.6667" data-duration="0.37" data-track-index="14" data-volume="0.35"></audio>
+  <audio id="sfx17" src="sfx/whoosh-short.mp3" data-start="35.8333" data-duration="0.57" data-track-index="15" data-volume="0.25"></audio>
+  <audio id="sfx18" src="sfx/whoosh.mp3" data-start="38.4000" data-duration="0.57" data-track-index="10" data-volume="0.35"></audio>
+  <audio id="sfx19" src="sfx/impact-bass-1.mp3" data-start="38.4667" data-duration="2.12" data-track-index="11" data-volume="0.3"></audio>
+  <audio id="sfx20" src="sfx/whoosh-short.mp3" data-start="40.9000" data-duration="0.57" data-track-index="12" data-volume="0.2"></audio>
+  <audio id="sfx21" src="sfx/whoosh-short.mp3" data-start="42.1000" data-duration="0.57" data-track-index="13" data-volume="0.25"></audio>
+  <audio id="sfx22" src="sfx/ping.mp3" data-start="46.8000" data-duration="1.32" data-track-index="14" data-volume="0.3"></audio>
+  <audio id="sfx23" src="sfx/whoosh.mp3" data-start="47.9667" data-duration="0.57" data-track-index="15" data-volume="0.35"></audio>
+  <audio id="sfx24" src="sfx/impact-bass-1.mp3" data-start="48.0333" data-duration="2.12" data-track-index="10" data-volume="0.3"></audio>
+  <audio id="sfx25" src="sfx/impact-bass-1.mp3" data-start="50.6667" data-duration="2.12" data-track-index="11" data-volume="0.3"></audio>
+  <audio id="sfx26" src="sfx/whoosh-short.mp3" data-start="52.8000" data-duration="0.57" data-track-index="12" data-volume="0.2"></audio>
+  <audio id="sfx27" src="sfx/click.mp3" data-start="54.2667" data-duration="0.37" data-track-index="13" data-volume="0.4"></audio>
+  <audio id="sfx28" src="sfx/click.mp3" data-start="54.5667" data-duration="0.37" data-track-index="14" data-volume="0.4"></audio>
+  <audio id="sfx29" src="sfx/click.mp3" data-start="55.1667" data-duration="0.37" data-track-index="15" data-volume="0.4"></audio>
+  <audio id="sfx30" src="sfx/whoosh-short.mp3" data-start="57.5000" data-duration="0.57" data-track-index="10" data-volume="0.2"></audio>
+  <audio id="sfx31" src="sfx/ping.mp3" data-start="59.7333" data-duration="1.32" data-track-index="11" data-volume="0.3"></audio>
+  <audio id="sfx32" src="sfx/whoosh.mp3" data-start="60.6333" data-duration="0.57" data-track-index="12" data-volume="0.35"></audio>
+  <audio id="sfx33" src="sfx/impact-bass-1.mp3" data-start="60.6667" data-duration="2.12" data-track-index="13" data-volume="0.3"></audio>
+  <audio id="sfx34" src="sfx/pop.mp3" data-start="62.0667" data-duration="0.72" data-track-index="14" data-volume="0.3"></audio>
+  <audio id="sfx35" src="sfx/pop.mp3" data-start="65.2000" data-duration="0.72" data-track-index="15" data-volume="0.28"></audio>
+  <audio id="sfx36" src="sfx/pop.mp3" data-start="68.2000" data-duration="0.72" data-track-index="10" data-volume="0.28"></audio>
+  <audio id="sfx37" src="sfx/ping.mp3" data-start="71.8333" data-duration="1.32" data-track-index="11" data-volume="0.28"></audio>
+  <audio id="sfx38" src="sfx/whoosh-short.mp3" data-start="73.1667" data-duration="0.57" data-track-index="12" data-volume="0.2"></audio>
+  <audio id="sfx39" src="sfx/impact-bass-1.mp3" data-start="76.1667" data-duration="2.12" data-track-index="13" data-volume="0.3"></audio>
+  <audio id="sfx40" src="sfx/click.mp3" data-start="77.8000" data-duration="0.37" data-track-index="14" data-volume="0.4"></audio>
+  <audio id="sfx41" src="sfx/whoosh.mp3" data-start="79.5000" data-duration="0.57" data-track-index="15" data-volume="0.35"></audio>
+  <audio id="sfx42" src="sfx/impact-bass-1.mp3" data-start="79.5333" data-duration="2.12" data-track-index="10" data-volume="0.3"></audio>
+  <audio id="sfx43" src="sfx/whoosh-short.mp3" data-start="81.5667" data-duration="0.57" data-track-index="11" data-volume="0.2"></audio>
+  <audio id="sfx44" src="sfx/pop.mp3" data-start="82.0333" data-duration="0.72" data-track-index="12" data-volume="0.28"></audio>
+  <audio id="sfx45" src="sfx/pop.mp3" data-start="84.7333" data-duration="0.72" data-track-index="13" data-volume="0.28"></audio>
+  <audio id="sfx46" src="sfx/pop.mp3" data-start="86.3333" data-duration="0.72" data-track-index="14" data-volume="0.28"></audio>
+  <audio id="sfx47" src="sfx/pop.mp3" data-start="88.8667" data-duration="0.72" data-track-index="15" data-volume="0.28"></audio>
+  <audio id="sfx48" src="sfx/pop.mp3" data-start="89.5333" data-duration="0.72" data-track-index="10" data-volume="0.28"></audio>
+  <audio id="sfx49" src="sfx/impact-bass-1.mp3" data-start="91.2333" data-duration="2.12" data-track-index="11" data-volume="0.3"></audio>
+  <audio id="sfx50" src="sfx/sparkle.mp3" data-start="93.0000" data-duration="1.80" data-track-index="12" data-volume="0.3"></audio>
+  <audio id="sfx51" src="sfx/whoosh.mp3" data-start="95.8000" data-duration="0.57" data-track-index="13" data-volume="0.35"></audio>
+  <audio id="sfx52" src="sfx/impact-bass-1.mp3" data-start="95.8667" data-duration="2.12" data-track-index="14" data-volume="0.3"></audio>
+  <audio id="sfx53" src="sfx/whoosh-short.mp3" data-start="101.6000" data-duration="0.57" data-track-index="15" data-volume="0.25"></audio>
+  <audio id="sfx54" src="sfx/pop.mp3" data-start="104.8000" data-duration="0.72" data-track-index="10" data-volume="0.3"></audio>
+  <audio id="sfx55" src="sfx/pop.mp3" data-start="106.6000" data-duration="0.72" data-track-index="11" data-volume="0.3"></audio>
+  <audio id="sfx56" src="sfx/pop.mp3" data-start="107.4000" data-duration="0.72" data-track-index="12" data-volume="0.3"></audio>
+  <audio id="sfx57" src="sfx/pop.mp3" data-start="108.2000" data-duration="0.72" data-track-index="13" data-volume="0.3"></audio>
+  <audio id="sfx58" src="sfx/whoosh.mp3" data-start="111.3667" data-duration="0.57" data-track-index="14" data-volume="0.35"></audio>
+  <audio id="sfx59" src="sfx/chime.mp3" data-start="112.1667" data-duration="2.50" data-track-index="15" data-volume="0.35"></audio>
+  <!-- SFX:END -->
+
+  <script src="vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      // vinheta de 4,6 s inserida em 24,0 s: tudo depois anda 4,6 s
+      // re-edição v2: tempos escritos no corte antigo → corte novo (mapa palavra a palavra) + vinheta de 4.6 s
+      const K = [[0.0, 0.0], [0.16, 0.16], [0.58, 0.58], [0.82, 0.82], [1.0, 1.0], [1.12, 1.12], [1.3, 1.3], [1.42, 1.42], [1.83, 1.853], [2.09, 2.113], [2.31, 2.333], [2.79, 2.813], [2.89, 2.913], [3.09, 3.113], [3.21, 3.233], [3.41, 3.433], [3.55, 3.573], [3.89, 3.913], [4.07, 4.093], [4.57, 4.593], [5.21, 5.233], [5.47, 5.493], [5.73, 5.753], [6.163, 6.213], [6.303, 6.353], [6.523, 6.573], [6.603, 6.653], [6.743, 6.793], [6.823, 6.873], [6.903, 6.953], [7.203, 7.253], [7.743, 7.793], [7.903, 7.953], [8.203, 8.253], [8.483, 8.533], [8.963, 9.013], [9.703, 9.753], [10.343, 10.393], [10.483, 10.533], [10.783, 10.833], [11.323, 11.373], [11.423, 11.473], [11.623, 11.673], [11.863, 11.913], [12.143, 12.193], [12.697, 12.767], [12.897, 12.967], [13.097, 13.167], [13.177, 13.247], [13.337, 13.407], [13.657, 13.727], [13.717, 13.787], [13.897, 13.967], [14.017, 14.087], [14.157, 14.227], [14.637, 14.707], [14.757, 14.827], [14.976, 15.046], [15.497, 15.587], [15.597, 15.687], [15.997, 16.087], [16.037, 16.127], [16.237, 16.327], [16.437, 16.527], [16.597, 16.687], [17.197, 17.32], [17.297, 17.42], [17.517, 17.64], [17.777, 17.9], [17.897, 18.02], [18.077, 18.2], [18.297, 18.42], [18.417, 18.54], [18.477, 18.6], [18.557, 18.68], [18.837, 18.96], [18.957, 19.08], [19.337, 19.46], [19.597, 19.72], [20.257, 20.38], [20.437, 20.56], [20.537, 20.66], [20.897, 21.02], [21.017, 21.14], [21.363, 21.48], [21.803, 21.92], [21.963, 22.08], [22.123, 22.24], [22.983, 22.933], [23.283, 23.233], [23.483, 23.433], [24.0, 23.933], [24.12, 24.053], [24.32, 24.253], [24.48, 24.413], [24.8, 24.733], [25.04, 24.973], [25.5, 25.433], [25.84, 25.773], [25.98, 25.913], [26.16, 26.093], [26.54, 26.473], [26.6, 26.533], [26.94, 26.873], [27.663, 27.62], [27.783, 27.74], [28.363, 28.32], [28.483, 28.44], [28.563, 28.52], [28.723, 28.68], [29.103, 29.06], [29.83, 29.78], [29.97, 29.92], [30.39, 30.34], [30.67, 30.62], [30.79, 30.74], [31.01, 30.96], [31.27, 31.22], [31.91, 31.86], [33.863, 33.807], [34.33, 34.293], [34.67, 34.633], [35.43, 35.427], [35.65, 35.647], [35.89, 35.887], [36.25, 36.247], [36.31, 36.307], [36.73, 36.727], [37.57, 37.4], [37.67, 37.5], [38.07, 37.9], [38.17, 38.0], [40.963, 40.793], [41.363, 41.22], [41.983, 41.64], [42.163, 41.82], [42.303, 41.96], [42.543, 42.2], [43.097, 42.78], [43.317, 43.0], [43.577, 43.26], [43.697, 43.38], [44.463, 44.173], [44.743, 44.453], [45.023, 44.733], [45.263, 44.973], [45.683, 45.393], [45.763, 45.473], [46.343, 46.053], [46.743, 46.453], [47.043, 46.753], [47.183, 46.893], [47.323, 47.033], [47.603, 47.313], [47.703, 47.413], [48.043, 47.753], [48.183, 47.893], [48.503, 48.213], [49.083, 48.793], [49.263, 48.973], [49.343, 49.053], [49.443, 49.153], [49.963, 49.673], [50.263, 49.973], [50.83, 50.56], [51.463, 51.227], [51.582, 51.346], [51.843, 51.607], [52.063, 51.827], [52.283, 52.047], [52.73, 52.527], [52.89, 52.687], [52.97, 52.767], [53.11, 52.907], [53.35, 53.147], [53.43, 53.227], [55.03, 54.82], [55.35, 55.14], [55.47, 55.26], [55.61, 55.4], [56.23, 56.033], [56.51, 56.313], [56.77, 56.573], [56.93, 56.733], [57.53, 57.333], [57.65, 57.453], [58.33, 58.167], [58.63, 58.467], [58.85, 58.687], [58.95, 58.787], [59.47, 59.307], [59.59, 59.427], [60.01, 59.847], [60.05, 59.887], [60.11, 59.947], [60.21, 60.047], [60.31, 60.147], [60.63, 60.467], [60.75, 60.587], [61.03, 60.867], [61.15, 60.987], [61.697, 61.54], [61.857, 61.7], [61.957, 61.8], [62.297, 62.14], [62.417, 62.26], [62.763, 62.607], [62.963, 62.807], [63.203, 63.047], [63.623, 63.467], [63.743, 63.587], [64.083, 63.927], [65.93, 65.827], [66.27, 66.167], [66.41, 66.307], [66.51, 66.407], [67.11, 67.007], [67.35, 67.247], [68.097, 68.007], [68.537, 68.447], [68.597, 68.507], [68.657, 68.567], [68.877, 68.787], [68.997, 68.907], [69.217, 69.127], [69.63, 69.553], [69.77, 69.693], [70.05, 69.973], [70.19, 70.113], [70.33, 70.253], [71.067, 70.967], [71.287, 71.187], [71.347, 71.247], [71.587, 71.487], [71.667, 71.567], [71.747, 71.647], [72.107, 72.007], [72.247, 72.147], [72.807, 72.707], [73.047, 72.947], [73.227, 73.127], [73.307, 73.207], [73.93, 73.86], [74.09, 74.02], [74.497, 74.453], [74.637, 74.593], [74.717, 74.673], [74.937, 74.893], [75.457, 75.413], [75.517, 75.473], [75.677, 75.633], [75.777, 75.733], [75.997, 75.953], [76.497, 76.453], [76.617, 76.573], [76.717, 76.673], [76.897, 76.853], [77.017, 76.973], [77.463, 77.433], [77.883, 77.853], [77.943, 77.913], [78.443, 78.413], [78.523, 78.493], [79.397, 79.367], [79.637, 79.607], [79.957, 79.927], [80.177, 80.147], [80.457, 80.427], [80.93, 80.9], [81.15, 81.12], [81.33, 81.3], [81.63, 81.6], [81.75, 81.72], [82.663, 82.64], [82.723, 82.7], [83.423, 83.4], [83.93, 83.96], [84.25, 84.28], [84.897, 84.933], [85.497, 85.567], [85.697, 85.767], [85.977, 86.047], [86.077, 86.147], [86.297, 86.367], [86.557, 86.627], [86.837, 86.907], [87.197, 87.267], [87.437, 87.507], [87.997, 88.067], [88.337, 88.407], [88.657, 88.727], [88.837, 88.907], [89.577, 89.647], [89.657, 89.727], [89.877, 89.947], [90.337, 90.407], [90.457, 90.527], [90.657, 90.727], [91.097, 91.2], [91.197, 91.3], [91.357, 91.46], [91.477, 91.58], [91.517, 91.62], [96.93, 97.0], [97.23, 97.3], [97.59, 97.66], [97.797, 97.88], [98.297, 98.38], [98.377, 98.46], [98.497, 98.58], [98.857, 98.94], [99.036, 99.119], [99.597, 99.68], [99.857, 99.94], [100.017, 100.1], [100.117, 100.2], [100.477, 100.56], [100.617, 100.7], [100.997, 101.093], [101.057, 101.153], [101.257, 101.353], [101.417, 101.513], [101.517, 101.613], [101.917, 102.013], [102.117, 102.213], [102.197, 102.293], [102.377, 102.473], [102.697, 102.793], [102.757, 102.853], [103.097, 103.193], [103.217, 103.313], [103.417, 103.513], [103.497, 103.593], [103.957, 104.053], [104.177, 104.273], [104.377, 104.473], [104.597, 104.693], [105.063, 105.193], [105.263, 105.393], [105.923, 106.053], [106.303, 106.433], [106.66, 106.7333], [110.2, 110.2733]];
+      const M = (s) => { let lo = 0, hi = K.length - 1; if (s <= K[0][0]) return s; if (s >= K[hi][0]) return K[hi][1] + (s - K[hi][0]);
+        while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (K[mid][0] <= s) lo = mid; else hi = mid; }
+        const [x0, y0] = K[lo], [x1, y1] = K[hi]; return x1 > x0 ? y0 + (s - x0) * (y1 - y0) / (x1 - x0) : y0; };
+      const T = (s) => (s >= 24.0 ? M(s) + 4.6 : M(s));
+      const q = (s) => Math.round(T(s) * 30) / 30;
+      const END = 110.2, VEND = 106.66;
+      const fx = document.getElementById("fx");
+      const STAR = '<svg viewBox="0 0 24 24" width="100%" height="100%"><path fill="#fff" d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z"/></svg>';
+      const CHECK = '<svg class="ok" width="56" height="56" viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" fill="var(--accent)"/><path d="M19 33 L28 42 L46 23" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      const ARROW_DOWN = '<svg class="arw" width="70" height="110" viewBox="0 0 80 120"><path d="M40 8 C30 40 50 70 40 106 M22 88 L40 108 L58 88" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      const ICON = {
+        like: '<svg width="44" height="44" viewBox="0 0 100 100"><path d="M18 48 h14 v38 h-14 z M32 50 l16 -28 a7 7 0 0 1 12 5 l-4 17 h22 a7 7 0 0 1 7 8 l-6 26 a7 7 0 0 1 -7 6 h-40" fill="none" stroke="#23262e" stroke-width="8" stroke-linejoin="round"/></svg>',
+        bell: '<svg width="44" height="44" viewBox="0 0 24 24"><path fill="#23262e" d="M12 22a2.5 2.5 0 0 0 2.5-2.5h-5A2.5 2.5 0 0 0 12 22zm7-6V11a7 7 0 0 0-5.5-6.8V3.5a1.5 1.5 0 0 0-3 0v.7A7 7 0 0 0 5 11v5l-2 2v1h18v-1z"/></svg>',
+        share: '<svg width="44" height="44" viewBox="0 0 100 100"><path d="M58 22 l24 22 l-24 22 M82 44 H56 a30 30 0 0 0 -30 30 v8" fill="none" stroke="#23262e" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        sun: '<svg width="44" height="44" viewBox="-40 -40 80 80"><circle r="12" fill="none" stroke="#23262e" stroke-width="7"/><path d="M0 -22 V-32 M0 22 V32 M-22 0 H-32 M22 0 H32 M16 16 L23 23 M-16 -16 L-23 -23 M16 -16 L23 -23 M-16 16 L-23 23" stroke="#23262e" stroke-width="7" stroke-linecap="round"/></svg>',
+        color: '<div style="width:42px;height:42px;border-radius:50%;background:conic-gradient(#ff3b30,#ffcc00,#34c759,#00c7be,#007aff,#af52de,#ff3b30)"></div>',
+        contrast: '<svg width="44" height="44" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#23262e" stroke-width="9"/><path d="M50 12 a38 38 0 0 1 0 76 z" fill="#23262e"/></svg>',
+        scene: '<svg width="44" height="44" viewBox="0 0 24 24"><path fill="#23262e" d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z"/></svg>',
+        music: '<svg width="44" height="44" viewBox="0 0 100 100"><path d="M40 72 V24 l36 -8 v48" fill="none" stroke="#23262e" stroke-width="9"/><circle cx="30" cy="74" r="12" fill="#23262e"/><circle cx="66" cy="66" r="12" fill="#23262e"/></svg>',
+        party: '<svg width="44" height="44" viewBox="-60 -60 120 120"><g stroke-width="12" stroke-linecap="round"><line y1="-30" y2="-52" stroke="#ff2d55"/><line y1="-30" y2="-52" stroke="#ffcc00" transform="rotate(60)"/><line y1="-30" y2="-52" stroke="#34c759" transform="rotate(120)"/><line y1="-30" y2="-52" stroke="#00c7be" transform="rotate(180)"/><line y1="-30" y2="-52" stroke="#4d7cff" transform="rotate(240)"/><line y1="-30" y2="-52" stroke="#af52de" transform="rotate(300)"/></g><circle r="16" fill="#23262e"/></svg>',
+        phone: '<svg width="34" height="48" viewBox="0 0 60 104"><rect x="4" y="4" width="52" height="96" rx="10" fill="none" stroke="#23262e" stroke-width="8"/><circle cx="30" cy="84" r="5" fill="#23262e"/></svg>',
+      };
+
+      // ── helpers ──
+      const hidden = [];
+      const H = (el) => hidden.push(el);
+      const IN = (sel, t, o = {}) => tl.fromTo(sel,
+        { opacity: 0, filter: "blur(" + (o.blur ?? 16) + "px)", scale: o.scale ?? 1.14, y: o.y ?? 0 },
+        { opacity: 1, filter: "blur(0px)", scale: 1, y: 0, duration: o.d ?? 0.28, ease: "power3.out", immediateRender: false }, q(t));
+      const POP = (sel, t) => tl.fromTo(sel, { opacity: 0, scale: 0.75, y: 20 }, { opacity: 1, scale: 1, y: 0, duration: 0.3, ease: "back.out(2.2)", immediateRender: false }, q(t));
+      const OUT = (sel, t) => tl.to(sel, { opacity: 0, filter: "blur(12px)", y: -12, duration: 0.18, ease: "power2.in" }, q(t - 0.18));
+      const DIM = (t0, t1, v = 0.6, blur = 0) => {
+        tl.to("#dim", { opacity: v, duration: 0.18, ease: "power2.out" }, q(t0));
+        tl.to("#dim", { opacity: 0, duration: 0.18, ease: "power2.in" }, q(t1 - 0.18));
+        if (blur) {
+          tl.to("#blurwrap", { filter: "blur(" + blur + "px)", duration: 0.18, ease: "power2.out" }, q(t0));
+          tl.to("#blurwrap", { filter: "blur(0px)", duration: 0.18, ease: "power2.in" }, q(t1 - 0.18));
+        }
+      };
+      const SPARK = (el, t) => tl.fromTo(el, { opacity: 0, scale: 0.2, rotation: -90 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.4, ease: "back.out(3)", immediateRender: false }, q(t));
+      const el = (html) => { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstChild; };
+      // block: container shown at t0, faded/blurred out at t1; parts = [[html, t, kind]]
+      function BLOCK(pos, t0, t1, parts, cls = "") {
+        const b = el('<div class="blk ' + cls + '"></div>');
+        Object.assign(b.style, pos);
+        fx.appendChild(b);
+        tl.set(b, { opacity: 1 }, q(t0));
+        if (t1 != null) OUT(b, t1);
+        parts.forEach(([html, t, kind, o]) => {
+          const p = el(html); b.appendChild(p);
+          if (t == null) return;
+          H(p);
+          if (kind === "pop") POP(p, t); else IN(p, t, o || {});
+        });
+        return b;
+      }
+      const L = (x, y) => ({ left: x + "px", top: y + "px" });
+      const C = (y) => ({ left: "0px", width: "1920px", top: y + "px" });
+      const CL = (y) => ({ left: "0px", width: "1560px", top: y + "px" }); // centro deslocado p/ não encostar no rosto (closes do celular)
+
+      // ── chrome: watermark, step chips, speed badges ──
+      fx.appendChild(el('<svg id="wm" viewBox="0 0 230 90"><g fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 72 V48 a20 20 0 0 1 40 0 V72" /><path d="M72 52 H112 A20 20 0 0 0 72 52 A20 20 0 0 0 92 72 H110" /><path d="M128 36 L140 48 M128 68 L140 56 M152 56 L164 68" /><circle cx="196" cy="52" r="20" /></g><path d="M152 48 L164 36" fill="none" stroke="#4d7cff" stroke-width="9" stroke-linecap="round" /></svg>'));
+      tl.fromTo("#wm", { opacity: 0 }, { opacity: 0.75, duration: 0.6 }, 1.0);
+      tl.to("#wm", { opacity: 0, duration: 0.3 }, q(106.3));
+      tl.set("#wm", { opacity: 0 }, 23.9333); tl.set("#wm", { opacity: 0.75 }, 28.5333);
+      tl.set("#shade", { opacity: 0 }, 23.9333); tl.set("#shade", { opacity: 1 }, 28.5333); // vinheta limpa, sem o degradê
+
+      // passos: tela cheia de título (ref. Eidryan "1º Lugar") + chip tracejado persistente
+      const STEPS = [["1", "Desligar", 24.8, 33.86], ["2", "Instalar", 33.86, 43.7], ["3", "Parear", 43.7, 56.23], ["4", "Aplicativo", 56.23, 74.94], ["5", "Controlar", 74.94, 85.5], ["✦", "Resultado", 91.1, 96.9]];
+      STEPS.forEach(([n, name, a, b], i) => {
+        const big = el('<div class="blk ctr" style="left:0;top:0;width:1920px;height:1080px;justify-content:center;gap:0">'
+          + '<div class="lead" style="font-size:52px">' + (n === "✦" ? "e o" : "passo") + '</div>'
+          + '<div style="font-weight:800;font-size:' + (n === "✦" ? 0 : 300) + 'px;line-height:0.95;letter-spacing:-14px;text-shadow:0 0 50px rgba(77,124,255,0.6),0 16px 40px rgba(0,0,0,0.6)" class="acc">' + (n === "✦" ? "" : n + "º") + '</div>'
+          + '<div class="bold" style="font-size:' + (n === "✦" ? 200 : 120) + 'px;letter-spacing:' + (n === "✦" ? -9 : -5) + 'px">' + name.toLowerCase() + '</div></div>');
+        fx.appendChild(big);
+        const dur = 1.0;
+        DIM(a, a + dur, 0.88, 14);
+        tl.set(big, { opacity: 1 }, q(a));
+        tl.fromTo(big.children, { opacity: 0, filter: "blur(20px)", scale: 1.2 }, { opacity: 1, filter: "blur(0px)", scale: 1, duration: 0.3, ease: "power3.out", stagger: 0.08, immediateRender: false }, q(a));
+        OUT(big, a + dur);
+        const chip = el('<div class="chip"><div class="n">' + n + '</div>' + name + '</div>');
+        fx.appendChild(chip);
+        tl.fromTo(chip, { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.3, ease: "power3.out", immediateRender: false }, q(a + dur));
+        tl.to(chip, { opacity: 0, x: -30, duration: 0.18, ease: "power2.in" }, q(b - 0.18));
+      });
+      const FF = '<svg width="40" height="28" viewBox="0 0 44 32"><path fill="#fff" d="M2 2l18 14L2 30zM22 2l18 14-18 14z"/></svg>';
+      [[36.6333, 38.3667, "3×"], [43.0000, 45.3333, "3×"], [58.3667, 59.3667, "2×"], [69.3000, 70.3667, "2×"], [96.8333, 101.5667, "2×"]].forEach(([a, b, s]) => {
+        const sp = el('<div class="speed">' + FF + s + '</div>'); fx.appendChild(sp);
+        tl.fromTo(sp, { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.25, ease: "power3.out", immediateRender: false }, Math.round(a * 30) / 30);
+        tl.to(sp, { opacity: 0, x: 30, duration: 0.18 }, Math.round((b - 0.18) * 30) / 30);
+      });
+
+      // ══════════ INTRO ══════════
+      BLOCK(L(110, 520), 1.0, 1.8, [['<div class="lead">meu nome é</div>', 1.0], ['<div class="bold">Luca</div>', 1.42, "in", { scale: 1.3 }]]);
+      BLOCK(L(110, 470), 3.9, 6.1, [
+        ['<svg width="420" height="164" viewBox="0 0 230 90"><g class="nx-draw" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 72 V48 a20 20 0 0 1 40 0 V72" /><path d="M72 52 H112 A20 20 0 0 0 72 52 A20 20 0 0 0 92 72 H110" /><path d="M128 36 L140 48 M128 68 L140 56 M152 56 L164 68" /><circle cx="196" cy="52" r="20" /></g><path d="M152 48 L164 36" fill="none" stroke="#4d7cff" stroke-width="9" stroke-linecap="round" /></svg>', 4.0, "in", { scale: 1, blur: 4 }],
+        ['<div class="lead">automação faça você mesmo</div>', 4.57]]);
+      tl.fromTo(".nx-draw > *", { strokeDasharray: 200, strokeDashoffset: 200 }, { strokeDashoffset: 0, duration: 0.7, ease: "power2.out", stagger: 0.08, immediateRender: false }, q(4.05));
+      BLOCK(L(110, 400), 7.74, 10.25, [
+        ['<div class="lead">vou te ensinar</div>', 6.9],
+        ['<div class="glow">como instalar</div>', 7.74],
+        ['<div class="bold" style="font-size:80px">lâmpada inteligente <span class="acc">Wi-Fi</span></div>', 8.48],
+      ]);
+      BLOCK(L(110, 520), 10.34, 11.3, [
+        ['<div class="lead">da linha</div>', 10.34],
+        ['<div class="bar" style="padding:12px 30px 12px 12px"><img src="img/avant-neo.jpg" style="width:84px;height:84px;border-radius:18px;object-fit:cover" />Avant Neo</div>', 10.78, "pop"],
+      ]);
+      // "em menos de 5 min" — cartão cheio (ref. Mateus Dias "em 30 min")
+      (function () {
+        const c = el('<div class="card"><div style="display:flex;align-items:center;gap:40px"><div class="lead" style="font-size:72px;text-shadow:none">em menos de</div>'
+          + '<div id="c5" style="font-weight:800;font-size:360px;letter-spacing:-16px;line-height:1;color:var(--ink)">5</div><div class="bold" style="font-size:150px;text-shadow:none">min</div></div>'
+          + '<div class="spk" style="left:300px;top:240px">' + STAR + '</div><div class="spk" style="left:1560px;top:760px">' + STAR + '</div></div>');
+        fx.appendChild(c);
+        tl.set(c, { opacity: 1 }, q(11.32)); tl.set(c, { opacity: 0 }, q(12.62));
+        tl.fromTo("#c5", { scale: 1.5, filter: "blur(18px)" }, { scale: 1, filter: "blur(0px)", duration: 0.3, ease: "power3.out", immediateRender: false }, q(11.86));
+      })();
+      BLOCK(L(110, 330), 12.7, 17.15, [
+        ['<div class="lead" style="margin-bottom:14px">esse vídeo é pra quem quer</div>', 12.7],
+        ['<div class="pill">' + ICON.party + 'baladinha no quarto</div>', 14.16, "pop"],
+        ['<div style="height:14px"></div>', null],
+        ['<div class="pill">' + ICON.phone + 'luz pelo celular</div>', 15.6, "pop"],
+      ]);
+      BLOCK(L(110, 420), 17.9, 21.3, [
+        ['<div class="lead">quer uma igual?</div>', 17.9],
+        ['<div class="dash">link na <span class="acc">descrição</span></div>', 18.96, "pop"],
+        ['<div style="margin-left:40px">' + ARROW_DOWN + '</div>', 20.26, "in", { scale: 1, blur: 4 }],
+      ]);
+      // "sem mais enrolações" → máquina de escrever, "bora pro vídeo" com brilho
+      DIM(21.78, 23.98, 0.7, 6);
+      (function () {
+        const b = BLOCK(C(400), 21.8, 23.98, [['<div class="bold" id="tw1" style="font-size:96px"></div>', null], ['<div class="glow" style="font-size:150px">bora pro <span class="acc">vídeo!</span></div>', 22.98, "in", { scale: 1.3, blur: 22 }]], "ctr");
+        const txt = "sem mais enrolação", t = document.getElementById("tw1"), o = { v: 0 }; let last = -1;
+        tl.to(o, { v: txt.length, duration: 0.85, ease: "none", onUpdate: () => { const n = Math.round(o.v); if (n !== last) { last = n; t.textContent = txt.slice(0, n); } } }, q(21.8));
+      })();
+
+      // ══════════ PASSO 1 — desligar / desrosquear ══════════
+      BLOCK(L(110, 470), 27.66, 29.82, [['<div class="lead">certifique que ela esteja</div>', 27.7], ['<div class="bold">desligada</div>', 29.1, "in", { scale: 1.3 }]]);
+      BLOCK(L(110, 470), 31.1, 33.8, [
+        ['<div class="lead">agora é só</div>', 30.39],
+        ['<div style="display:flex;align-items:center;gap:20px"><div class="glow">desrosquear</div><svg id="rot1" width="96" height="96" viewBox="0 0 100 100"><path d="M14 50 a36 36 0 1 1 26 34" fill="none" stroke="#4d7cff" stroke-width="10" stroke-linecap="round"/><path d="M14 30 V52 H36" fill="none" stroke="#4d7cff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></div>', 31.27],
+      ]);
+      tl.fromTo("#rot1", { rotation: 0 }, { rotation: -720, duration: 2.4, ease: "none", immediateRender: false }, q(31.4));
+
+      // ══════════ PASSO 2 — instalar ══════════
+      BLOCK(L(110, 470), 35.4, 37.5, [['<div class="lead">pega a</div>', 35.89], ['<div class="bold">lâmpada <span class="acc">inteligente</span></div>', 36.31]]);
+      BLOCK(L(110, 470), 37.6, 40.9, [
+        ['<div class="lead">e rosqueia no lugar</div>', 37.6],
+        ['<div style="display:flex;align-items:center;gap:20px"><div class="glow">rosquear</div><svg id="rot2" width="96" height="96" viewBox="0 0 100 100"><path d="M86 50 a36 36 0 1 0 -26 34" fill="none" stroke="#4d7cff" stroke-width="10" stroke-linecap="round"/><path d="M86 30 V52 H64" fill="none" stroke="#4d7cff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg></div>', 37.67],
+      ]);
+      tl.fromTo("#rot2", { rotation: 0 }, { rotation: 720, duration: 3.0, ease: "none", immediateRender: false }, q(37.8));
+      BLOCK(L(110, 520), 42.2, 43.68, [['<div class="dash">' + CHECK + 'instalada</div>', 42.54, "pop"]]);
+
+      // ══════════ PASSO 3 — parear ══════════
+      BLOCK(L(110, 420), 44.7, 47.6, [
+        ['<div class="lead">liga e desliga</div>', 45.26],
+        ['<div style="display:flex;align-items:baseline;gap:18px"><div class="acc" style="font-weight:800;font-size:220px;line-height:0.95;letter-spacing:-10px;text-shadow:0 0 40px rgba(77,124,255,0.6),0 14px 40px rgba(0,0,0,0.5)">3</div><div class="bold" style="font-size:80px">vezes</div></div>', 46.34, "in", { scale: 1.5, blur: 22 }],
+      ]);
+      BLOCK(L(110, 470), 47.66, 49.88, [['<div class="lead">até ela piscar pra</div>', 47.7], ['<div class="bold">parear com o <span class="acc">Wi-Fi</span></div>', 48.5]]);
+      // "uma, duas, três" — células (ref. Eidryan calendário)
+      (function () {
+        const b = BLOCK(L(110, 470), 49.9, 51.5, [['<div style="display:flex;gap:18px" id="cells"><div class="cell" id="k1">1</div><div class="cell" id="k2">2</div><div class="cell" id="k3">3</div></div>', 49.9, "in", { scale: 1, blur: 8 }]]);
+        [[49.96, 1], [50.26, 2], [50.83, 3]].forEach(([t, n]) => {
+          tl.set("#k" + n, { color: "#4d7cff", boxShadow: "inset 0 0 0 7px #4d7cff", backgroundColor: "#10172e" }, q(t));
+          tl.fromTo("#k" + n, { scale: 1.25 }, { scale: 1, duration: 0.22, ease: "back.out(2)", immediateRender: false }, q(t));
+        });
+      })();
+      BLOCK(L(110, 470), 51.84, 53.95, [['<div class="lead">deixa ligado até ela</div>', 51.84], ['<div class="bold" id="pisc">piscar</div>', 53.11]]);
+      tl.to("#pisc", { opacity: 0.25, duration: 0.1, yoyo: true, repeat: 5, ease: "none" }, q(53.45));
+      BLOCK(L(110, 520), 55.0, 56.2, [['<div class="dash">' + CHECK + 'piscando</div>', 55.35, "pop"]]);
+
+      // ══════════ PASSO 4 — aplicativo (celular em close: texto no alto, ao centro) ══════════
+      BLOCK(L(110, 470), 57.3, 58.3, [['<div class="lead">vamo pro app da</div>', 56.5], ['<div class="bar" style="padding:12px 30px 12px 12px"><img src="img/avant-neo.jpg" style="width:84px;height:84px;border-radius:18px;object-fit:cover" />Avant Neo</div>', 57.65, "pop"]]);
+      BLOCK(CL(150), 60.6, 62.7, [['<div class="dash" style="font-size:50px">link do download na <span class="acc">descrição</span></div>', 60.75, "pop"], [ARROW_DOWN, 61.7, "in", { scale: 1, blur: 4 }]], "ctr");
+      BLOCK(CL(150), 63.1, 65.85, [['<div class="lead">clica em</div>', 63.2], ['<div class="bar"><span class="acc" style="font-size:64px;line-height:0.8">+</span>adicionar dispositivo</div>', 63.74, "pop"]], "ctr");
+      BLOCK(CL(150), 65.93, 68.05, [['<div class="lead">achou a lâmpada?</div>', 65.93], ['<div class="bar">' + CHECK + 'conectar</div>', 67.35, "pop"]], "ctr");
+      BLOCK(CL(150), 68.1, 70.98, [['<div class="lead">conecta com o</div>', 68.1], ['<div class="bold" style="font-size:76px"><span class="acc">Wi-Fi</span> da sua casa</div>', 68.66]], "ctr");
+      BLOCK(CL(130), 71.07, 72.78, [['<div style="display:flex;align-items:center;gap:26px"><div class="lead" style="font-size:52px">em menos de</div><div class="acc" style="font-weight:800;font-size:190px;line-height:1;letter-spacing:-8px;text-shadow:0 0 40px rgba(77,124,255,0.6),0 14px 40px rgba(0,0,0,0.5)">1</div><div class="bold">min</div></div>', 71.67, "in", { scale: 1.4, blur: 20 }]], "ctr");
+      tl.set(fx.lastChild, { opacity: 1 }, q(71.07));
+      BLOCK(L(110, 470), 72.81, 74.92, [['<div class="lead">clica em</div>', 72.81], ['<div class="pill">concluído</div>', 73.31, "pop"]]);
+
+      // ══════════ PASSO 5 — controlar (lista de recursos em pills, ref. Thiago) ══════════
+      BLOCK(L(110, 470), 75.9, 77.4, [['<div class="lead">controla do jeito que</div>', 75.9], ['<div class="bold">quiser</div>', 77.02]]);
+      BLOCK(L(110, 250), 77.42, 85.48, [
+        ['<div class="pill">' + ICON.sun + 'luminosidade</div>', 77.46, "pop"], ['<div style="height:12px"></div>', null],
+        ['<div class="pill">' + ICON.color + 'cor</div>', 80.18, "pop"], ['<div style="height:12px"></div>', null],
+        ['<div class="pill">' + ICON.contrast + 'contraste</div>', 81.75, "pop"], ['<div style="height:12px"></div>', null],
+        ['<div class="pill">' + ICON.scene + 'cenas</div>', 84.25, "pop"], ['<div style="height:12px"></div>', null],
+        ['<div class="pill">' + ICON.music + 'música</div>', 84.9, "pop"],
+      ]);
+
+      // ══════════ fechamento ══════════
+      BLOCK(L(110, 400), 85.98, 88.0, [['<div style="display:flex;align-items:center;gap:24px"><div class="lead" style="font-size:48px">em menos de</div><div class="acc" style="font-weight:800;font-size:200px;line-height:1;letter-spacing:-8px;text-shadow:0 0 40px rgba(77,124,255,0.6),0 14px 40px rgba(0,0,0,0.5)">5</div><div class="bold">min</div></div>', 86.56, "in", { scale: 1.4, blur: 20 }]]);
+      tl.set(fx.lastChild, { opacity: 1 }, q(85.98));
+      BLOCK(L(110, 470), 88.0, 91.0, [['<div class="lead">você aprendeu</div>', 87.9], ['<div class="glow">muito <span class="acc">fácil</span></div>', 88.34]]);
+      // "Muito fácil, né?" + link + CTA
+      BLOCK(L(110, 470), 96.93, 97.78, [['<div class="glow">muito fácil, <span class="acc">né?</span></div>', 96.93]]);
+      BLOCK(L(110, 420), 97.8, 100.95, [['<div class="lead">o link da lâmpada tá na</div>', 97.8], ['<div class="dash">descrição</div>', 100.12, "pop"], ['<div style="margin-left:40px">' + ARROW_DOWN + '</div>', 100.3, "in", { scale: 1, blur: 4 }]]);
+      tl.to(".arw", { y: 12, duration: 0.35, yoyo: true, repeat: 3, ease: "sine.inOut" }, q(100.5));
+      BLOCK(L(110, 330), 101.0, 105.0, [
+        ['<div class="lead" style="margin-bottom:14px">se te ajudou</div>', 101.0],
+        ['<div class="pill">' + ICON.like + 'deixa o like</div>', 101.92, "pop"], ['<div style="height:12px"></div>', null],
+        ['<div class="pill">' + ICON.bell + 'se inscreve</div>', 102.7, "pop"], ['<div style="height:12px"></div>', null],
+        ['<div class="pill">' + ICON.share + 'compartilha</div>', 103.5, "pop"],
+      ]);
+      BLOCK(L(110, 470), 105.06, 106.62, [['<div class="lead">muito obrigado</div>', 105.06], ['<div class="glow">e <span class="acc">fui!</span></div>', 106.3, "in", { scale: 1.4 }]]);
+
+      // end card
+      tl.fromTo("#end", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, q(VEND));
+      tl.fromTo(".end-draw > *", { strokeDasharray: 200, strokeDashoffset: 200 }, { strokeDashoffset: 0, duration: 0.9, ease: "power2.out", stagger: 0.1 }, q(106.8));
+      tl.fromTo("#end-blue", { opacity: 0, scale: 0.2, svgOrigin: "158 42" }, { opacity: 1, scale: 1, svgOrigin: "158 42", duration: 0.35, ease: "back.out(3)" }, q(107.5));
+      tl.fromTo("#end-tag", { opacity: 0, filter: "blur(12px)" }, { opacity: 0.9, filter: "blur(0px)", duration: 0.4, ease: "power2.out" }, q(107.7));
+      tl.fromTo("#end-btn", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }, q(108.0));
+      tl.fromTo("#end-btn", { scale: 1 }, { scale: 1.08, duration: 0.15, yoyo: true, repeat: 1, ease: "power2.out", immediateRender: false }, q(108.9));
+
+      gsap.set(hidden, { opacity: 0 });
+      gsap.set(".spk", { opacity: 1 });
+
+      // ── legendas ──
+      const WORDS = [["Fala", 0.0], ["pessoal,", 0.16], ["tudo", 0.58], ["bem?", 0.82], ["Meu", 1.0], ["nome", 1.12], ["é", 1.3], ["Luca.", 1.42], ["Sejam", 1.83], ["muito", 2.09], ["bem-vindos", 2.31], ["a", 2.79], ["mais", 2.89], ["um", 3.09], ["vídeo", 3.21], ["do", 3.41], ["canal", 3.55], ["da", 3.89], ["Nexo,", 4.07], ["Automação", 4.57], ["Faça", 5.21], ["Você", 5.47], ["Mesmo.", 5.73], ["No", 6.16], ["vídeo", 6.3], ["de", 6.52], ["hoje", 6.6], ["eu", 6.74], ["vou", 6.82], ["ensinar", 6.9], ["você", 7.2], ["como", 7.74], ["instalar", 7.9], ["essa", 8.2], ["lâmpada", 8.48], ["inteligente", 8.96], ["Wi-Fi", 9.7], ["da", 10.34], ["linha", 10.48], ["Avant Neo", 10.78], ["em", 11.32], ["menos", 11.42], ["de", 11.62], ["cinco", 11.86], ["minutos.", 12.14], ["esse", 12.7], ["vídeo", 12.9], ["é", 13.1], ["pra", 13.18], ["você", 13.34], ["que", 13.66], ["quer", 13.72], ["ter", 13.9], ["uma", 14.02], ["baladinha", 14.16], ["no", 14.64], ["seu", 14.76], ["quarto", 14.98], ["ou", 15.5], ["controlar", 15.6], ["a", 16.0], ["luz", 16.04], ["pelo", 16.24], ["seu", 16.44], ["celular.", 16.6], ["Se", 17.2], ["você", 17.3], ["quiser", 17.52], ["ter", 17.78], ["uma", 17.9], ["como", 18.08], ["essa,", 18.3], ["eu", 18.42], ["vou", 18.48], ["deixar", 18.56], ["o", 18.84], ["link", 18.96], ["desse", 19.34], ["produto", 19.6], ["aqui", 20.26], ["na", 20.44], ["descrição", 20.54], ["do", 20.9], ["vídeo.", 21.02], ["Então,", 21.36], ["sem", 21.8], ["mais", 21.96], ["enrolações,", 22.12], ["bora", 22.98], ["pro", 23.28], ["vídeo!", 23.48], ["Então", 24.0], ["vamo", 24.12], ["lá,", 24.32], ["galera.", 24.48], ["Nosso", 24.8], ["primeiro", 25.04], ["passo", 25.5], ["pra", 25.84], ["poder", 25.98], ["instalar", 26.16], ["a", 26.54], ["lâmpada", 26.6], ["inteligente,", 26.94], ["é", 27.66], ["certificar", 27.78], ["de", 28.36], ["que", 28.48], ["ela", 28.56], ["esteja", 28.72], ["desligada.", 29.1], ["E", 29.83], ["pronto,", 29.97], ["agora", 30.39], ["cê", 30.67], ["já", 30.79], ["pode", 31.01], ["desrosquear", 31.27], ["ela.", 31.91], ["Pronto,", 33.86], ["agora", 34.33], ["desrosqueada,", 34.67], ["você", 35.43], ["pode", 35.65], ["pegar", 35.89], ["a", 36.25], ["lâmpada", 36.31], ["inteligente", 36.73], ["e", 37.57], ["rosquear", 37.67], ["no", 38.07], ["lugar.", 38.17], ["Pronto,", 40.96], ["agora", 41.36], ["que", 41.98], ["já", 42.16], ["está", 42.3], ["instalada,", 42.54], ["vamo", 43.1], ["partir", 43.32], ["pra", 43.58], ["configuração", 43.7], ["vocês", 44.46], ["terão", 44.74], ["que", 45.02], ["ligar", 45.26], ["e", 45.68], ["desligar", 45.76], ["três", 46.34], ["vezes", 46.74], ["até", 47.04], ["ela", 47.18], ["começar", 47.32], ["a", 47.6], ["piscar", 47.7], ["pra", 48.04], ["poder", 48.18], ["parear", 48.5], ["com", 49.08], ["o", 49.26], ["seu", 49.34], ["Wi-Fi.", 49.44], ["Uma,", 49.96], ["duas,", 50.26], ["três", 50.83], ["e", 51.46], ["pronto.", 51.58], ["Agora", 51.84], ["deixa", 52.06], ["ligado", 52.28], ["até", 52.73], ["que", 52.89], ["ela", 52.97], ["comece", 53.11], ["a", 53.35], ["piscar.", 53.43], ["Pronto,", 55.03], ["já", 55.35], ["tá", 55.47], ["piscando.", 55.61], ["Agora", 56.23], ["vamo", 56.51], ["pro", 56.77], ["aplicativo", 56.93], ["da", 57.53], ["Avant Neo.", 57.65], ["Agora", 58.33], ["aqui", 58.63], ["no", 58.85], ["aplicativo", 58.95], ["da", 59.47], ["Avant Neo,", 59.59], ["que", 60.01], ["eu", 60.05], ["vou", 60.11], ["tá", 60.21], ["deixando", 60.31], ["o", 60.63], ["link", 60.75], ["do", 61.03], ["download", 61.15], ["aqui", 61.7], ["na", 61.86], ["descrição", 61.96], ["do", 62.3], ["vídeo,", 62.42], ["você", 62.76], ["terá", 62.96], ["clicar", 63.2], ["em", 63.62], ["adicionar", 63.74], ["dispositivo.", 64.08], ["Achou", 65.93], ["já", 66.27], ["a", 66.41], ["lâmpada,", 66.51], ["pode", 67.11], ["conectar.", 67.35], ["Conecta", 68.1], ["com", 68.54], ["o", 68.6], ["Wi-Fi", 68.66], ["da", 68.88], ["sua", 69.0], ["casa", 69.22], ["e", 69.63], ["pronto,", 69.77], ["já", 70.05], ["tá", 70.19], ["conectando.", 70.33], ["Pronto,", 71.07], ["em", 71.29], ["menos", 71.35], ["de", 71.59], ["um", 71.67], ["minuto", 71.75], ["já", 72.11], ["conectou.", 72.25], ["Agora", 72.81], ["clica", 73.05], ["em", 73.23], ["concluído", 73.31], ["e", 73.93], ["pronto,", 74.09], ["ela", 74.5], ["já", 74.64], ["está", 74.72], ["conectada", 74.94], ["e", 75.46], ["você", 75.52], ["já", 75.68], ["pode", 75.78], ["controlar", 76.0], ["ela", 76.5], ["do", 76.62], ["jeito", 76.72], ["que", 76.9], ["quiser.", 77.02], ["Aumentar", 77.46], ["e", 77.88], ["diminuir", 77.94], ["a", 78.44], ["luminosidade,", 78.52], ["pode", 79.4], ["mexer", 79.64], ["na", 79.96], ["cor", 80.18], ["dela,", 80.46], ["aqui", 80.93], ["pode", 81.15], ["aumentar", 81.33], ["o", 81.63], ["contraste,", 81.75], ["a", 82.66], ["luminosidade", 82.72], ["também,", 83.42], ["tem", 83.93], ["cenas,", 84.25], ["música.", 84.9], ["E", 85.5], ["pronto,", 85.7], ["em", 85.98], ["menos", 86.08], ["de", 86.3], ["cinco", 86.56], ["minutos,", 86.84], ["você", 87.2], ["aprendeu", 87.44], ["muito", 88.0], ["fácil", 88.34], ["como", 88.66], ["instalar", 88.84], ["a", 89.58], ["lâmpada", 89.66], ["inteligente", 89.88], ["na", 90.34], ["sua", 90.46], ["casa.", 90.66], ["E", 91.1], ["esse", 91.2], ["foi", 91.36], ["o", 91.48], ["resultado.", 91.52], ["Muito", 96.93], ["fácil,", 97.23], ["né?", 97.59], ["Lembrando", 97.8], ["que", 98.3], ["o", 98.38], ["link", 98.5], ["da", 98.86], ["lâmpada", 99.04], ["estará", 99.6], ["aqui", 99.86], ["na", 100.02], ["descrição", 100.12], ["do", 100.48], ["vídeo.", 100.62], ["Se", 101.0], ["esse", 101.06], ["vídeo", 101.26], ["te", 101.42], ["ajudou,", 101.52], ["deixe", 101.92], ["o", 102.12], ["seu", 102.2], ["like,", 102.38], ["se", 102.7], ["inscreva", 102.76], ["no", 103.1], ["canal", 103.22], ["e", 103.42], ["compartilhe", 103.5], ["para", 103.96], ["todos", 104.18], ["seus", 104.38], ["amigos.", 104.6], ["Muito", 105.06], ["obrigado", 105.26], ["e", 105.92], ["fui!", 106.3]];
+      const OFF = [[11.32, 12.62], [21.78, 23.98], [24.8, 25.8], [33.86, 34.86], [43.7, 44.7], [56.23, 57.23], [74.94, 75.94], [91.1, 92.1], [VEND, END]];
+      const off = (t) => OFF.some(([a, b]) => t >= a - 0.01 && t < b);
+      const chunks = []; let cur = [];
+      WORDS.forEach((w, i) => {
+        cur.push(i);
+        const nx = WORDS[i + 1], gap = nx ? nx[1] - w[1] : 9;
+        if (cur.length === 4 || /[.,?!]$/.test(w[0]) || gap > 0.6 || (nx && off(nx[1]) !== off(w[1]))) { chunks.push(cur); cur = []; }
+      });
+      if (cur.length) chunks.push(cur);
+      const capRoot = document.getElementById("captions");
+      chunks.forEach((idxs, ci) => {
+        const t0 = WORDS[idxs[0]][1];
+        if (off(t0)) return;
+        const nxt = chunks[ci + 1] ? WORDS[chunks[ci + 1][0]][1] : VEND;
+        let t1 = Math.min(nxt, WORDS[idxs[idxs.length - 1]][1] + 0.9);
+        OFF.forEach(([a]) => { if (a > t0 && a < t1) t1 = a; });
+        const d = document.createElement("div"); d.className = "cap"; d.id = "cap" + ci;
+        idxs.forEach((wi, k) => {
+          const s = document.createElement("span"); s.className = "cw"; s.id = "cw" + wi;
+          s.textContent = WORDS[wi][0].replace(/[.,]$/, "") + (k < idxs.length - 1 ? " " : ""); d.appendChild(s);
+        });
+        capRoot.appendChild(d);
+        tl.set(d, { opacity: 1 }, q(t0));
+        tl.fromTo(d, { y: 14, filter: "blur(8px)" }, { y: 0, filter: "blur(0px)", duration: 0.16, ease: "power2.out", immediateRender: false }, q(t0));
+        tl.set(d, { opacity: 0 }, q(t1));
+        idxs.forEach((wi, k) => {
+          tl.set("#cw" + wi, { color: "#6f95ff" }, q(WORDS[wi][1]));
+          if (k < idxs.length - 1) tl.set("#cw" + wi, { color: "#ffffff" }, q(WORDS[idxs[k + 1]][1]));
+        });
+      });
+
+      tl.set({}, {}, q(END));
+      window.__timelines = window.__timelines || {};
+      window.__timelines["youtube"] = tl;
+    })();
+  </script>
+</div>
+</body>
+</html>

@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<style>
+  /* Tipografia no estilo das referências (Eidryan / Thiago / Mateus Dias):
+     Poppins pesada com tracking apertado, lead-in em itálico leve, blur-in por palavra,
+     caixas tracejadas, pills 3D, "?" gigante, palavra-fantasma atrás, telas cheias de impacto. */
+  @font-face { font-family: "Poppins"; src: url("fonts/poppins-500.woff2") format("woff2"); font-weight: 500; font-display: block; }
+  @font-face { font-family: "Poppins"; src: url("fonts/poppins-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+  @font-face { font-family: "Poppins"; src: url("fonts/poppins-800.woff2") format("woff2"); font-weight: 800; font-display: block; }
+  @font-face { font-family: "Poppins"; src: url("fonts/poppins-300-italic.woff2") format("woff2"); font-weight: 300; font-style: italic; font-display: block; }
+  @font-face { font-family: "Poppins"; src: url("fonts/poppins-900-italic.woff2") format("woff2"); font-weight: 900; font-style: italic; font-display: block; }
+
+  :root { --accent: #4d7cff; --ink: #0d1220; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #000; font-family: "Poppins", sans-serif; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+  #blurwrap { position: absolute; inset: 0; }
+  #frame { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden; transform-origin: 50% 30%; }
+  #bg-video { width: 1080px; height: 1920px; object-fit: cover; display: block; }
+  #shade { position: absolute; left: 0; right: 0; bottom: 0; height: 1100px; background: linear-gradient(to top, rgba(0,0,0,0.62), rgba(0,0,0,0.25) 55%, rgba(0,0,0,0)); pointer-events: none; }
+  #dim { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0.55), rgba(0,0,0,0.92)); opacity: 0; pointer-events: none; }
+
+  #fx { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; pointer-events: none; color: #fff; }
+  .blk { position: absolute; opacity: 0; }
+  .col { display: flex; flex-direction: column; gap: 10px; }
+  .ctr { left: 0; width: 1080px; align-items: center; text-align: center; }
+  .w { display: inline-block; white-space: pre; }
+
+  /* type roles */
+  .lead { font-weight: 300; font-style: italic; font-size: 46px; letter-spacing: -0.5px; opacity: 0.92; text-shadow: 0 3px 12px rgba(0,0,0,0.55); }
+  .bold { font-weight: 800; font-size: 96px; line-height: 1.02; letter-spacing: -3.5px; text-shadow: 0 6px 22px rgba(0,0,0,0.5); }
+  .tight { font-weight: 700; font-size: 70px; line-height: 1.08; letter-spacing: -2.8px; text-shadow: 0 4px 16px rgba(0,0,0,0.6); }
+  .glow { font-weight: 800; font-size: 118px; line-height: 0.98; letter-spacing: -2px; text-transform: uppercase;
+          text-shadow: 0 0 26px rgba(255,255,255,0.55), 0 0 6px rgba(255,255,255,0.4), 0 8px 26px rgba(0,0,0,0.45); }
+  .acc { color: var(--accent); }
+  .glow .acc { text-shadow: 0 0 30px rgba(77,124,255,0.75), 0 8px 26px rgba(0,0,0,0.45); }
+  .ghost { position: absolute; font-weight: 800; text-transform: uppercase; color: transparent; -webkit-text-stroke: 3px rgba(255,255,255,0.28); letter-spacing: -8px; white-space: nowrap; }
+
+  /* objects */
+  .pill { display: inline-block; padding: 18px 36px 20px; border-radius: 20px; background: #f3f4f7; color: #23262e; font-weight: 700; font-size: 46px; letter-spacing: -1px;
+          box-shadow: 0 7px 0 #b9bdc8, 0 18px 34px rgba(0,0,0,0.38); white-space: nowrap; }
+  .dash { display: inline-flex; align-items: center; gap: 18px; padding: 16px 34px 20px; border: 3.5px dashed rgba(255,255,255,0.9); border-radius: 24px; background: rgba(255,255,255,0.12);
+          font-weight: 800; letter-spacing: -2px; white-space: nowrap; text-shadow: 0 4px 14px rgba(0,0,0,0.4); }
+  .bar { display: flex; align-items: center; justify-content: space-between; gap: 30px; width: 900px; padding: 22px 34px; border-radius: 22px; background: rgba(13,18,32,0.94);
+         font-weight: 700; font-size: 58px; letter-spacing: -2px; box-shadow: 0 16px 40px rgba(0,0,0,0.4); }
+  .tag { font-weight: 700; font-size: 26px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); }
+  .qm { font-weight: 800; font-size: 380px; line-height: 1; color: #fff;
+        text-shadow: 0 2px 0 #d6d6d6, 0 4px 0 #c4c4c4, 0 6px 0 #b3b3b3, 0 8px 0 #a3a3a3, 0 10px 0 #939393, 0 12px 0 #848484, 0 22px 40px rgba(0,0,0,0.55); }
+  .spk { position: absolute; width: 54px; height: 54px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.85)); opacity: 0; }
+
+  /* calendar (ref. Eidryan "45 dias") */
+  .cal { display: grid; grid-template-columns: repeat(6, 118px); gap: 14px; }
+  .cell { width: 118px; height: 118px; border-radius: 10px; background: #222; display: flex; align-items: center; justify-content: center;
+          font-weight: 800; font-size: 62px; letter-spacing: -2px; color: #fff; box-shadow: inset 0 -10px 18px rgba(0,0,0,0.45); }
+  .cell.on { color: var(--accent); box-shadow: inset 0 0 0 6px var(--accent); background: #10172e; }
+
+  /* full-screen card (ref. Mateus Dias) */
+  .card { position: absolute; inset: 0; background: var(--accent); opacity: 0;
+          background-image: linear-gradient(rgba(255,255,255,0.08) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.08) 2px, transparent 2px);
+          background-size: 72px 72px; display: flex; align-items: center; justify-content: center; }
+
+  .prog { width: 640px; height: 26px; border-radius: 13px; background: rgba(255,255,255,0.22); overflow: hidden; }
+  .prog i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 13px; box-shadow: 0 0 18px rgba(77,124,255,0.9); }
+  .strike { position: absolute; left: -10px; right: -10px; top: 54%; height: 12px; border-radius: 6px; background: var(--accent); transform-origin: 0 50%; transform: scaleX(0); }
+
+  /* day chip + watermark */
+  #day { position: absolute; left: 64px; top: 262px; padding: 12px 24px 14px; border: 3px dashed rgba(255,255,255,0.85); border-radius: 20px; background: rgba(0,0,0,0.42);
+         font-weight: 800; font-size: 38px; letter-spacing: -1px; opacity: 0; text-shadow: 0 2px 10px rgba(0,0,0,0.4); }
+  #wm { position: absolute; right: 64px; top: 280px; width: 150px; opacity: 0; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.35)); }
+
+  /* captions */
+  #captions { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; pointer-events: none; }
+  .cap { position: absolute; left: 0; width: 1080px; top: 1640px; text-align: center; opacity: 0; white-space: nowrap;
+         font-weight: 700; font-size: 62px; letter-spacing: -2px; line-height: 1; color: #fff;
+         text-shadow: 0 4px 18px rgba(0,0,0,0.65), 0 2px 4px rgba(0,0,0,0.5); }
+  .cap .cw { display: inline-block; white-space: pre; }
+</style>
+</head>
+<body>
+<div id="stage" data-composition-id="reels" data-start="0" data-duration="43.03" data-fps="30" data-width="1080" data-height="1920">
+
+  <div id="blurwrap">
+    <div id="frame">
+      <video id="bg-video" src="input-video.mp4" playsinline data-has-audio="true" data-start="0" data-duration="43.03" data-track-index="1"></video>
+    </div>
+  </div>
+  <div id="shade"></div>
+  <div id="dim"></div>
+
+  <div class="clip" id="fx" data-start="0" data-duration="43.03" data-track-index="2">
+
+    <div id="day">DIA <span class="acc">09</span>/30</div>
+    <svg id="wm" viewBox="0 0 230 90">
+      <g fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 72 V48 a20 20 0 0 1 40 0 V72" /><path d="M72 52 H112 A20 20 0 0 0 72 52 A20 20 0 0 0 92 72 H110" />
+        <path d="M128 36 L140 48 M128 68 L140 56 M152 56 L164 68" /><circle cx="196" cy="52" r="20" />
+      </g>
+      <path d="M152 48 L164 36" fill="none" stroke="#4d7cff" stroke-width="9" stroke-linecap="round" />
+    </svg>
+
+    <!-- b01 pills: um app pra lâmpada / tomada / câmera -->
+    <div class="blk col" id="b01" style="left:540px;top:930px;gap:30px;align-items:flex-start">
+      <svg id="b01-arrow" width="150" height="110" viewBox="0 0 150 110" style="margin-left:-40px"><path d="M140 96 C100 100 40 80 22 20 M10 40 L22 18 L42 34" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      <div class="pill" id="b01-1">app da lâmpada</div>
+      <div class="pill" id="b01-2">app da tomada</div>
+      <div class="pill" id="b01-3">app da câmera</div>
+    </div>
+
+    <!-- b02 "?" gigante -->
+    <div class="blk" id="b02" style="left:640px;top:820px"><div class="qm" id="b02-q">?</div></div>
+
+    <!-- b03 calendário: dias contados -->
+    <div class="blk col ctr" id="b03" style="top:600px;gap:26px">
+      <div class="lead" id="b03-l">isso tá com os</div>
+      <div class="cal" id="b03-cal"></div>
+      <div class="bold" id="b03-b">dias contados</div>
+    </div>
+
+    <!-- b04 Matter (tela cheia escurecida) -->
+    <div class="blk" id="b04" style="left:0;top:0;width:1080px;height:1920px">
+      <div class="ghost" id="b04-g" style="font-size:420px;left:50%;top:760px">MATTER</div>
+      <div class="col ctr" style="position:absolute;top:780px">
+        <div class="lead" id="b04-l" style="font-size:52px">o nome disso é</div>
+        <div id="b04-m" style="font-weight:800;font-size:250px;letter-spacing:-12px;line-height:1;text-shadow:0 0 40px rgba(255,255,255,0.35),0 14px 40px rgba(0,0,0,0.6)">Matter</div>
+      </div>
+      <svg class="spk" id="b04-s1" style="left:150px;top:690px" viewBox="0 0 24 24"><path fill="#fff" d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z"/></svg>
+      <svg class="spk" id="b04-s2" style="left:880px;top:1120px" viewBox="0 0 24 24"><path fill="#fff" d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z"/></svg>
+    </div>
+
+    <!-- b05 NOVO PADRÃO -->
+    <div class="blk col" id="b05" style="left:70px;top:1150px;gap:0">
+      <div class="glow" id="b05-1">novo</div>
+      <div class="glow" id="b05-2"><span class="acc">padrão</span></div>
+    </div>
+
+    <!-- b06 marcas diferentes → juntos -->
+    <div class="blk col" id="b06" style="left:70px;top:1110px;gap:12px;align-items:flex-start">
+      <div class="lead" id="b06-l">aparelhos de</div>
+      <div class="bold" id="b06-b" style="font-size:88px">marcas diferentes</div>
+      <div class="dash" id="b06-d" style="font-size:64px;margin-top:14px">funcionando <span class="acc" id="b06-j">juntos</span></div>
+    </div>
+
+    <!-- b07 máquina de escrever -->
+    <div class="blk col ctr" id="b07" style="top:880px">
+      <div class="tight" id="b07-t" style="font-size:78px;width:900px;white-space:normal"></div>
+    </div>
+
+    <!-- b08 citação -->
+    <div class="blk col ctr" id="b08" style="top:860px;gap:18px">
+      <div class="lead">você pensando:</div>
+      <div class="tight" style="font-size:74px;width:940px;white-space:normal">
+        <span class="w" id="b08-0">“Então </span><span class="w" id="b08-1">eu </span><span class="w" id="b08-2">preciso </span><span class="w" id="b08-3">de </span><span class="w acc" id="b08-4">Matter </span><span class="w" id="b08-5">pra </span><span class="w" id="b08-6">começar?”</span>
+      </div>
+    </div>
+
+    <!-- b09 NÃO (cartão cheio) -->
+    <div class="card" id="b09">
+      <div style="font-weight:800;font-size:330px;letter-spacing:-16px;color:#fff;text-shadow:0 18px 50px rgba(0,0,0,0.3)">NÃO.</div>
+      <svg class="spk" id="b09-s1" style="left:170px;top:700px;opacity:1" viewBox="0 0 24 24"><path fill="#fff" d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z"/></svg>
+      <svg class="spk" id="b09-s2" style="left:850px;top:1150px;opacity:1" viewBox="0 0 24 24"><path fill="#fff" d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z"/></svg>
+    </div>
+
+    <!-- b10 padrão perfeito -->
+    <div class="blk col" id="b10" style="left:70px;top:1170px;gap:6px;align-items:flex-start">
+      <div class="lead" id="b10-l">se você for esperar o</div>
+      <div class="bold"><span class="w" id="b10-1">padrão </span><span class="w acc" id="b10-2">perfeito</span></div>
+    </div>
+
+    <!-- b11 você nunca começa (palavra-fantasma) -->
+    <div class="blk" id="b11" style="left:0;top:0;width:1080px;height:1920px">
+      <div class="ghost" id="b11-g" style="font-size:300px;left:50%;top:1080px">NUNCA</div>
+      <div class="col ctr" style="position:absolute;top:1190px">
+        <div class="bold" style="font-size:104px"><span class="w" id="b11-1">você </span><span class="w acc" id="b11-2">nunca </span><span class="w" id="b11-3">começa</span></div>
+      </div>
+    </div>
+
+    <!-- b12 linha "comece com" -->
+    <div class="blk col ctr" id="b12" style="top:1170px;gap:12px">
+      <div class="tag" style="align-self:flex-start;margin-left:90px">comece com</div>
+      <div class="bar" id="b12-bar"><span>o que funciona <span class="acc">hoje</span></span>
+        <svg id="b12-ok" width="64" height="64" viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" fill="var(--accent)" /><path d="M19 33 L28 42 L46 23" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" /></svg></div>
+    </div>
+
+    <!-- b13 selo -->
+    <div class="blk col" id="b13" style="left:70px;top:1150px;gap:12px;align-items:flex-start">
+      <div class="lead" id="b13-l">presta atenção no</div>
+      <div class="dash" id="b13-d" style="font-size:76px">selo <span class="acc">Matter</span></div>
+    </div>
+
+    <!-- b14 A PROMESSA MAIS LEGAL -->
+    <div class="blk col" id="b14" style="left:70px;top:1130px;gap:0">
+      <div class="glow" id="b14-1" style="font-size:104px">a promessa</div>
+      <div class="glow" id="b14-2" style="font-size:104px"><span class="acc">mais legal</span></div>
+      <div class="lead" id="b14-3" style="margin-top:14px">da automação hoje</div>
+      <svg class="spk" id="b14-s" style="left:820px;top:-40px" viewBox="0 0 24 24"><path fill="#fff" d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z"/></svg>
+    </div>
+
+    <!-- b15 em expansão -->
+    <div class="blk col" id="b15" style="left:70px;top:1180px;gap:14px;align-items:flex-start">
+      <div class="lead" id="b15-l">mas ainda está</div>
+      <div class="bold" id="b15-b">em expansão</div>
+      <div class="prog" id="b15-p"><i id="b15-f"></i></div>
+    </div>
+
+    <!-- b16 ficar parado -->
+    <div class="blk col" id="b16" style="left:70px;top:1180px;gap:6px;align-items:flex-start">
+      <div class="lead" id="b16-l">então não é motivo de</div>
+      <div class="bold" id="b16-b"><span style="position:relative;display:inline-block">ficar parado<span class="strike" id="b16-x"></span></span></div>
+    </div>
+
+    <!-- b17 comenta aí -->
+    <div class="blk col ctr" id="b17" style="top:1080px;gap:24px">
+      <div class="dash" id="b17-d" style="font-size:52px">
+        <svg width="56" height="50" viewBox="0 0 110 96"><path d="M14 10 H96 a8 8 0 0 1 8 8 V58 a8 8 0 0 1 -8 8 H44 L24 86 V66 H14 a8 8 0 0 1 -8 -8 V18 a8 8 0 0 1 8 -8 z" fill="none" stroke="#fff" stroke-width="9" stroke-linejoin="round" /></svg>
+        comenta aí</div>
+      <div class="bold" style="font-size:90px;line-height:1.05"><span class="w" id="b17-1">quantos </span><span class="w acc" id="b17-2">apps</span><br /><span class="w" id="b17-3">você </span><span class="w" id="b17-4">tem?</span></div>
+    </div>
+
+    <!-- b18 mais de cinco -->
+    <div class="blk col ctr" id="b18" style="top:860px;gap:0">
+      <div class="lead" id="b18-l">aposto que tem gente com</div>
+      <div style="display:flex;align-items:baseline;gap:22px">
+        <div class="lead" id="b18-m" style="font-size:64px">mais de</div>
+        <div id="b18-n" style="font-weight:800;font-size:360px;letter-spacing:-14px;line-height:1;text-shadow:0 0 40px rgba(77,124,255,0.6),0 16px 40px rgba(0,0,0,0.5)" class="acc">5</div>
+        <div class="bold" id="b18-a" style="font-size:96px">apps</div>
+      </div>
+    </div>
+
+    <!-- b19 segue a Nexo -->
+    <div class="blk col ctr" id="b19" style="top:1120px;gap:30px">
+      <svg width="300" height="118" viewBox="0 0 230 90"><g fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 72 V48 a20 20 0 0 1 40 0 V72" /><path d="M72 52 H112 A20 20 0 0 0 72 52 A20 20 0 0 0 92 72 H110" /><path d="M128 36 L140 48 M128 68 L140 56 M152 56 L164 68" /><circle cx="196" cy="52" r="20" /></g><path d="M152 48 L164 36" fill="none" stroke="#4d7cff" stroke-width="9" stroke-linecap="round" /></svg>
+      <div id="b19-btn" style="display:inline-flex;align-items:center;gap:16px;padding:22px 52px 26px;border-radius:60px;background:var(--ink);font-weight:800;font-size:58px;letter-spacing:-1.5px;box-shadow:0 0 0 4px rgba(255,255,255,0.15),0 16px 40px rgba(0,0,0,0.45)"><span class="acc">+</span> seguir</div>
+    </div>
+
+    <!-- b20 amanhã: Alexa vs Google vs Apple -->
+    <div class="blk col ctr" id="b20" style="top:1010px;gap:0">
+      <div class="lead" id="b20-l" style="margin-bottom:10px">amanhã, no dia 10:</div>
+      <div class="glow" id="b20-1" style="font-size:112px">Alexa</div>
+      <div class="lead" id="b20-v1" style="font-size:44px">vs</div>
+      <div class="glow" id="b20-2" style="font-size:112px">Google</div>
+      <div class="lead" id="b20-v2" style="font-size:44px">vs</div>
+      <div class="glow" id="b20-3" style="font-size:112px"><span class="acc">Apple</span></div>
+    </div>
+  </div>
+
+  <div id="captions"></div>
+
+  <!-- MUSIC -->
+  <audio id="bgm" src="music/bgm.wav" data-start="0" data-duration="43.03" data-track-index="9" data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0.0,"v":0.16},{"t":24.7,"v":0.16},{"t":25.1,"v":0.42},{"t":26.9,"v":0.42},{"t":27.25,"v":0.16},{"t":37.1,"v":0.16},{"t":37.4,"v":0.32},{"t":38.2,"v":0.32},{"t":38.4,"v":0.16},{"t":42.4,"v":0.16},{"t":43.03,"v":0.4}]}]}'></audio>
+  <!-- SFX:BEGIN -->
+  <audio id="sfx00" src="sfx/whoosh-short.mp3" data-start="1.0200" data-duration="0.57" data-track-index="10" data-volume="0.25"></audio>
+  <audio id="sfx01" src="sfx/pop.mp3" data-start="1.4800" data-duration="0.72" data-track-index="11" data-volume="0.3"></audio>
+  <audio id="sfx02" src="sfx/pop.mp3" data-start="2.4200" data-duration="0.72" data-track-index="12" data-volume="0.3"></audio>
+  <audio id="sfx03" src="sfx/pop.mp3" data-start="3.4500" data-duration="0.72" data-track-index="13" data-volume="0.3"></audio>
+  <audio id="sfx04" src="sfx/error.mp3" data-start="4.4400" data-duration="1.62" data-track-index="14" data-volume="0.2"></audio>
+  <audio id="sfx05" src="sfx/whoosh.mp3" data-start="5.4300" data-duration="0.57" data-track-index="15" data-volume="0.3"></audio>
+  <audio id="sfx06" src="sfx/click-soft.mp3" data-start="5.9700" data-duration="0.37" data-track-index="10" data-volume="0.35"></audio>
+  <audio id="sfx07" src="sfx/ping.mp3" data-start="6.2300" data-duration="1.32" data-track-index="11" data-volume="0.25"></audio>
+  <audio id="sfx08" src="sfx/whoosh.mp3" data-start="6.9000" data-duration="0.57" data-track-index="12" data-volume="0.35"></audio>
+  <audio id="sfx09" src="sfx/impact-bass-1.mp3" data-start="7.7800" data-duration="2.12" data-track-index="13" data-volume="0.4"></audio>
+  <audio id="sfx10" src="sfx/sparkle.mp3" data-start="7.9000" data-duration="1.80" data-track-index="14" data-volume="0.3"></audio>
+  <audio id="sfx11" src="sfx/whoosh-short.mp3" data-start="9.4100" data-duration="0.57" data-track-index="15" data-volume="0.3"></audio>
+  <audio id="sfx12" src="sfx/whoosh-short.mp3" data-start="11.0900" data-duration="0.57" data-track-index="10" data-volume="0.25"></audio>
+  <audio id="sfx13" src="sfx/pop.mp3" data-start="12.4500" data-duration="0.72" data-track-index="11" data-volume="0.28"></audio>
+  <audio id="sfx14" src="sfx/ping.mp3" data-start="13.0100" data-duration="1.32" data-track-index="12" data-volume="0.25"></audio>
+  <audio id="sfx15" src="sfx/click-soft.mp3" data-start="13.5500" data-duration="0.37" data-track-index="13" data-volume="0.25"></audio>
+  <audio id="sfx16" src="sfx/click-soft.mp3" data-start="13.8500" data-duration="0.37" data-track-index="14" data-volume="0.25"></audio>
+  <audio id="sfx17" src="sfx/click-soft.mp3" data-start="14.1500" data-duration="0.37" data-track-index="15" data-volume="0.25"></audio>
+  <audio id="sfx18" src="sfx/click-soft.mp3" data-start="14.4500" data-duration="0.37" data-track-index="10" data-volume="0.25"></audio>
+  <audio id="sfx19" src="sfx/whoosh-short.mp3" data-start="15.1300" data-duration="0.57" data-track-index="11" data-volume="0.3"></audio>
+  <audio id="sfx20" src="sfx/impact-bass-2.mp3" data-start="17.0000" data-duration="2.59" data-track-index="12" data-volume="0.45"></audio>
+  <audio id="sfx21" src="sfx/whoosh-short.mp3" data-start="18.0000" data-duration="0.57" data-track-index="13" data-volume="0.25"></audio>
+  <audio id="sfx22" src="sfx/pop.mp3" data-start="19.1600" data-duration="0.72" data-track-index="14" data-volume="0.28"></audio>
+  <audio id="sfx23" src="sfx/whoosh.mp3" data-start="19.7600" data-duration="0.57" data-track-index="15" data-volume="0.3"></audio>
+  <audio id="sfx24" src="sfx/whoosh-short.mp3" data-start="20.7600" data-duration="0.57" data-track-index="10" data-volume="0.28"></audio>
+  <audio id="sfx25" src="sfx/ping.mp3" data-start="22.0800" data-duration="1.32" data-track-index="11" data-volume="0.3"></audio>
+  <audio id="sfx26" src="sfx/pop.mp3" data-start="23.4000" data-duration="0.72" data-track-index="12" data-volume="0.3"></audio>
+  <audio id="sfx27" src="sfx/whoosh-short.mp3" data-start="27.9500" data-duration="0.57" data-track-index="13" data-volume="0.3"></audio>
+  <audio id="sfx28" src="sfx/sparkle.mp3" data-start="28.4500" data-duration="1.80" data-track-index="14" data-volume="0.3"></audio>
+  <audio id="sfx29" src="sfx/whoosh-short.mp3" data-start="29.7000" data-duration="0.57" data-track-index="15" data-volume="0.25"></audio>
+  <audio id="sfx30" src="sfx/click.mp3" data-start="30.3000" data-duration="0.37" data-track-index="10" data-volume="0.35"></audio>
+  <audio id="sfx31" src="sfx/whoosh-short.mp3" data-start="32.0500" data-duration="0.57" data-track-index="11" data-volume="0.3"></audio>
+  <audio id="sfx32" src="sfx/pop.mp3" data-start="32.4600" data-duration="0.72" data-track-index="12" data-volume="0.3"></audio>
+  <audio id="sfx33" src="sfx/whoosh-short.mp3" data-start="33.0200" data-duration="0.57" data-track-index="13" data-volume="0.2"></audio>
+  <audio id="sfx34" src="sfx/whoosh-short.mp3" data-start="35.4300" data-duration="0.57" data-track-index="14" data-volume="0.25"></audio>
+  <audio id="sfx35" src="sfx/impact-bass-1.mp3" data-start="36.7700" data-duration="2.12" data-track-index="15" data-volume="0.35"></audio>
+  <audio id="sfx36" src="sfx/whoosh.mp3" data-start="38.7600" data-duration="0.57" data-track-index="10" data-volume="0.3"></audio>
+  <audio id="sfx37" src="sfx/click.mp3" data-start="39.1500" data-duration="0.37" data-track-index="11" data-volume="0.45"></audio>
+  <audio id="sfx38" src="sfx/whoosh-short.mp3" data-start="40.4000" data-duration="0.57" data-track-index="12" data-volume="0.25"></audio>
+  <audio id="sfx39" src="sfx/pop.mp3" data-start="41.1000" data-duration="0.72" data-track-index="13" data-volume="0.28"></audio>
+  <audio id="sfx40" src="sfx/pop.mp3" data-start="42.0200" data-duration="0.72" data-track-index="14" data-volume="0.28"></audio>
+  <audio id="sfx41" src="sfx/pop.mp3" data-start="42.7400" data-duration="0.29" data-track-index="15" data-volume="0.3"></audio>
+  <!-- SFX:END -->
+
+  <script src="vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      // o corte de "na próxima compra" foi recuado 0,1 s: tudo a partir de 23,7 s anda 3 frames
+      const T = (s) => (s >= 23.7 ? s + 0.1 : s);
+      const q = (s) => Math.round(T(s) * 30) / 30;
+      const END = 42.93;
+
+      // ── helpers (ref: blur-in por palavra / saída com blur) ──
+      const IN = (sel, t, o = {}) => tl.fromTo(sel,
+        { opacity: 0, filter: "blur(" + (o.blur ?? 18) + "px)", scale: o.scale ?? 1.14, y: o.y ?? 0 },
+        { opacity: 1, filter: "blur(0px)", scale: 1, y: 0, duration: o.d ?? 0.28, ease: "power3.out", immediateRender: false }, q(t));
+      const OUT = (sel, t) => tl.to(sel, { opacity: 0, filter: "blur(12px)", y: -14, duration: 0.18, ease: "power2.in" }, q(t - 0.18));
+      const SHOW = (sel, t0, t1) => { tl.set(sel, { opacity: 1 }, q(t0)); if (t1 != null) tl.set(sel, { opacity: 0 }, q(t1)); };
+      const hidden = [];
+      const H = (sel) => { hidden.push(sel); };
+      const DIM = (t0, t1, v = 0.6, blur = 0) => {
+        tl.to("#dim", { opacity: v, duration: 0.2, ease: "power2.out" }, q(t0));
+        tl.to("#dim", { opacity: 0, duration: 0.2, ease: "power2.in" }, q(t1 - 0.2));
+        if (blur) {
+          tl.to("#blurwrap", { filter: "blur(" + blur + "px)", duration: 0.2, ease: "power2.out" }, q(t0));
+          tl.to("#blurwrap", { filter: "blur(0px)", duration: 0.2, ease: "power2.in" }, q(t1 - 0.2));
+        }
+      };
+      const SPARK = (sel, t) => tl.fromTo(sel, { opacity: 0, scale: 0.2, rotation: -90 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.4, ease: "back.out(3)", immediateRender: false }, q(t));
+
+      gsap.set(["#b04-g", "#b11-g"], { xPercent: -50 });
+
+      // chrome
+      tl.fromTo("#day", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }, 0.1);
+      tl.fromTo("#wm", { opacity: 0 }, { opacity: 0.85, duration: 0.5 }, 0.3);
+
+      // ── in-camera transitions mantidas da versão anterior ──
+      [8.4, 37.5667].forEach((c) => {
+        tl.to("#frame", { filter: "blur(18px)", scale: 1.06, duration: 0.1, ease: "power2.in" }, q(c - 0.1));
+        tl.to("#frame", { filter: "blur(0px)", scale: 1, duration: 0.18, ease: "power2.out" }, q(c));
+      });
+      tl.set("#frame", { transformOrigin: "475px 864px" }, q(26.0667));
+      tl.fromTo("#frame", { scale: 2.2, x: 97 }, { scale: 1, x: 0, duration: 0.6, ease: "power2.out", immediateRender: false }, q(26.0667));
+      tl.set("#frame", { transformOrigin: "50% 30%" }, q(26.7));
+      tl.set("#frame", { scale: 1.1 }, q(20.06)); tl.set("#frame", { scale: 1 }, q(20.7)); // punch "nunca"
+
+      // b01 pills
+      SHOW("#b01", 1.0, null); OUT("#b01", 4.4);
+      tl.fromTo("#b01-arrow path", { strokeDasharray: 260, strokeDashoffset: 260 }, { strokeDashoffset: 0, duration: 0.4, ease: "power2.out" }, q(1.02));
+      [["#b01-1", 1.48], ["#b01-2", 2.42], ["#b01-3", 3.45]].forEach(([s, t]) => {
+        H(s); tl.fromTo(s, { opacity: 0, x: 80, rotation: 4 }, { opacity: 1, x: 0, rotation: 0, duration: 0.3, ease: "back.out(2.2)", immediateRender: false }, q(t));
+      });
+
+      // b02 ?
+      IN("#b02", 4.44, { scale: 0.5, blur: 10 }); OUT("#b02", 4.85);
+      tl.fromTo("#b02-q", { rotation: -8 }, { rotation: 8, duration: 0.1, yoyo: true, repeat: 3, ease: "sine.inOut" }, q(4.55));
+
+      // b03 calendário
+      (function () {
+        const cal = document.getElementById("b03-cal");
+        for (let i = 1; i <= 30; i++) { const c = document.createElement("div"); c.className = "cell"; c.id = "cell" + i; c.textContent = i; cal.appendChild(c); }
+      })();
+      DIM(5.4, 6.9, 0.85, 8);
+      SHOW("#b03", 5.43, null); OUT("#b03", 6.88);
+      H("#b03-l"); H("#b03-b"); H(".cell");
+      IN("#b03-l", 5.43);
+      tl.fromTo(".cell", { opacity: 0, y: 30, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.25, ease: "power2.out", stagger: 0.008, immediateRender: false }, q(5.5));
+      (function () {
+        const o = { v: 0 }; let last = 0;
+        tl.to(o, { v: 30, duration: 0.6, ease: "power1.in", onUpdate: function () {
+          const n = Math.round(o.v);
+          if (n === last) return;
+          for (let i = 1; i <= 30; i++) document.getElementById("cell" + i).classList.toggle("on", i === n);
+          last = n;
+        } }, q(5.97));
+      })();
+      IN("#b03-b", 6.23);
+
+      // b04 Matter (tela cheia)
+      DIM(6.9, 9.2, 0.92, 16);
+      SHOW("#b04", 6.9, null); OUT("#b04", 9.2);
+      H("#b04-l"); H("#b04-m"); H("#b04-g");
+      IN("#b04-l", 6.98);
+      IN("#b04-m", 7.78, { scale: 1.35, blur: 26, d: 0.35 });
+      tl.fromTo("#b04-g", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1.08, duration: 1.4, ease: "power1.out", immediateRender: false }, q(7.78));
+      SPARK("#b04-s1", 7.9); SPARK("#b04-s2", 8.05);
+
+      // b05 NOVO PADRÃO
+      SHOW("#b05", 9.41, null); OUT("#b05", 11.0);
+      H("#b05-1"); H("#b05-2"); IN("#b05-1", 9.41); IN("#b05-2", 9.65);
+
+      // b06 marcas diferentes → juntos
+      SHOW("#b06", 11.09, null); OUT("#b06", 13.48);
+      H("#b06-l"); H("#b06-b"); H("#b06-d");
+      IN("#b06-l", 11.09); IN("#b06-b", 11.69);
+      tl.fromTo("#b06-d", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)", immediateRender: false }, q(12.45));
+      H("#b06-j"); IN("#b06-j", 13.01, { scale: 1.4 });
+
+      // b07 máquina de escrever (ref. Eidryan)
+      DIM(13.48, 15.1, 0.7, 6);
+      SHOW("#b07", 13.51, null); OUT("#b07", 15.08);
+      (function () {
+        const txt = "sem ter que pular de app pra app", el = document.getElementById("b07-t");
+        const o = { v: 0 }; let last = -1;
+        tl.to(o, { v: txt.length, duration: 1.25, ease: "none", onUpdate: function () {
+          const n = Math.round(o.v); if (n === last) return; last = n; el.textContent = txt.slice(0, n);
+        } }, q(13.51));
+      })();
+
+      // b08 citação
+      DIM(15.1, 16.98, 0.7, 6);
+      SHOW("#b08", 15.13, null); OUT("#b08", 16.98);
+      [15.13, 15.49, 15.57, 15.95, 16.11, 16.37, 16.49].forEach((t, i) => { H("#b08-" + i); IN("#b08-" + i, t, { y: 10, blur: 12 }); });
+
+      // b09 NÃO (corte seco)
+      SHOW("#b09", 17.0, 17.47);
+      tl.fromTo("#b09 > div", { scale: 1.25 }, { scale: 1, duration: 0.2, ease: "power3.out", immediateRender: false }, q(17.0));
+
+      // b10 padrão perfeito
+      SHOW("#b10", 18.0, null); OUT("#b10", 19.72);
+      H("#b10-l"); H("#b10-1"); H("#b10-2");
+      IN("#b10-l", 18.0); IN("#b10-1", 18.82); IN("#b10-2", 19.16, { scale: 1.3 });
+
+      // b11 você nunca começa (fantasma)
+      DIM(19.74, 20.74, 0.45);
+      SHOW("#b11", 19.76, null); OUT("#b11", 20.74);
+      H("#b11-g"); H("#b11-1"); H("#b11-2"); H("#b11-3");
+      tl.fromTo("#b11-g", { opacity: 0, scale: 1.15 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power2.out", immediateRender: false }, q(19.9));
+      IN("#b11-1", 19.76); IN("#b11-2", 20.06, { scale: 1.35 }); IN("#b11-3", 20.32);
+
+      // b12 comece com o que funciona hoje
+      SHOW("#b12", 20.76, null); OUT("#b12", 22.46);
+      tl.fromTo("#b12", { y: 40 }, { y: 0, duration: 0.3, ease: "power3.out" }, q(20.76));
+      H("#b12-ok"); tl.fromTo("#b12-ok", { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(3)", immediateRender: false }, q(22.08));
+
+      // b13 selo
+      SHOW("#b13", 22.58, null); OUT("#b13", 24.6);
+      H("#b13-l"); H("#b13-d");
+      IN("#b13-l", 22.58);
+      tl.fromTo("#b13-d", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)", immediateRender: false }, q(23.4));
+
+      // b14 a promessa mais legal
+      SHOW("#b14", 27.85, null); OUT("#b14", 29.55);
+      H("#b14-1"); H("#b14-2"); H("#b14-3");
+      IN("#b14-1", 27.85); IN("#b14-2", 28.25, { scale: 1.3 }); IN("#b14-3", 28.77); SPARK("#b14-s", 28.35);
+
+      // b15 em expansão
+      SHOW("#b15", 29.6, null); OUT("#b15", 30.72);
+      H("#b15-l"); H("#b15-b"); H("#b15-p");
+      IN("#b15-l", 29.6); IN("#b15-b", 30.1); IN("#b15-p", 30.16, { scale: 1, blur: 6 });
+      tl.fromTo("#b15-f", { width: "0%" }, { width: "62%", duration: 0.5, ease: "power2.out", immediateRender: false }, q(30.2));
+
+      // b16 ficar parado (riscado)
+      SHOW("#b16", 30.74, null); OUT("#b16", 32.3);
+      H("#b16-l"); H("#b16-b");
+      IN("#b16-l", 30.74); IN("#b16-b", 31.66);
+      tl.fromTo("#b16-x", { scaleX: 0 }, { scaleX: 1, duration: 0.22, ease: "power2.out", immediateRender: false }, q(31.95));
+
+      // b17 comenta aí
+      SHOW("#b17", 32.36, null); OUT("#b17", 35.28);
+      H("#b17-d"); tl.fromTo("#b17-d", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)", immediateRender: false }, q(32.36));
+      [["#b17-1", 32.92], ["#b17-2", 33.22], ["#b17-3", 34.24], ["#b17-4", 34.48]].forEach(([s, t]) => { H(s); IN(s, t); });
+
+      // b18 mais de cinco
+      DIM(35.3, 37.4, 0.5);
+      SHOW("#b18", 35.33, null); OUT("#b18", 37.42);
+      H("#b18-l"); H("#b18-m"); H("#b18-n"); H("#b18-a");
+      IN("#b18-l", 35.33); IN("#b18-m", 36.29); IN("#b18-n", 36.67, { scale: 1.6, blur: 24, d: 0.32 }); IN("#b18-a", 36.85);
+
+      // b19 segue a Nexo
+      SHOW("#b19", 38.66, null); OUT("#b19", 39.52);
+      tl.fromTo("#b19", { y: 40, filter: "blur(10px)" }, { y: 0, filter: "blur(0px)", duration: 0.3, ease: "power3.out" }, q(38.66));
+      tl.fromTo("#b19-btn", { scale: 1 }, { scale: 1.12, duration: 0.14, yoyo: true, repeat: 1, ease: "power2.out" }, q(39.05));
+
+      // b20 amanhã
+      SHOW("#b20", 40.3, null);
+      [["#b20-l", 40.3], ["#b20-1", 41.0], ["#b20-v1", 41.48], ["#b20-2", 41.92], ["#b20-v2", 42.26], ["#b20-3", 42.64]].forEach(([s, t]) => { H(s); IN(s, t); });
+
+      // esconde estados iniciais dos filhos animados
+      gsap.set(hidden, { opacity: 0 });
+
+      // ── legendas: blocos de até 3 palavras, palavra ativa na cor de destaque ──
+      const WORDS = [["Olha",0.03],["só",0.21],["meu",0.33],["celular,",0.45],["um",0.90],["app",1.02],["pra",1.30],["lâmpada,",1.48],["um",1.96],["app",2.06],["pra",2.26],["tomada,",2.42],["um",2.93],["app",3.03],["pra",3.23],["câmera.",3.45],["O",3.90],["seu",4.00],["também",4.14],["é",4.38],["assim?",4.44],["Relaxa,",4.83],["isso",5.43],["tá",5.61],["com",5.73],["os",5.85],["dias",5.97],["contados",6.23],["O",6.90],["nome",6.98],["disso",7.22],["é",7.68],["Matter",7.78],["É",9.25],["um",9.33],["novo",9.41],["padrão",9.65],["feito",10.07],["justamente",10.33],["para",10.91],["aparelhos",11.09],["de",11.57],["marcas",11.69],["diferentes",11.97],["funcionarem",12.45],["juntos,",13.01],["sem",13.51],["ter",13.67],["que",13.77],["pular",13.91],["de",14.17],["app",14.31],["para",14.55],["app",14.75],["Ah,",15.13],["então",15.31],["eu",15.49],["preciso",15.57],["de",15.95],["Matter",16.11],["pra",16.37],["começar?",16.49],["Não.",17.00],["Sendo",17.30],["bem",17.50],["sincero,",17.62],["se",18.00],["você",18.08],["for",18.32],["esperar",18.44],["o",18.72],["padrão",18.82],["perfeito,",19.16],["você",19.76],["nunca",20.06],["começa",20.32],["Começa",20.76],["com",21.30],["o",21.40],["que",21.50],["funciona",21.64],["hoje",22.08],["e",22.46],["presta",22.58],["atenção",22.78],["no",23.20],["selo",23.40],["na",23.73],["próxima",23.85],["compra",24.23],["Matter",27.19],["é",27.71],["a",27.77],["promessa",27.85],["mais",28.25],["legal",28.45],["da",28.71],["automação",28.77],["hoje,",29.27],["mas",29.60],["ainda",29.76],["está",29.94],["em",30.10],["expansão,",30.16],["então",30.74],["não",30.98],["é",31.12],["motivo",31.20],["de",31.54],["ficar",31.66],["parado",31.90],["Comenta",32.36],["aí",32.70],["quantos",32.92],["apps",33.22],["de",33.42],["casa",33.54],["inteligente",33.70],["você",34.24],["tem",34.48],["no",34.60],["seu",34.70],["celular.",34.88],["Aposto",35.33],["que",35.69],["tem",35.77],["gente",35.93],["com",36.19],["mais",36.29],["de",36.51],["cinco",36.67],["Ah,",38.26],["e",38.66],["segue",38.78],["a Nexo.",39.02],["Lembrando",39.54],["que",39.92],["o",40.00],["vídeo",40.10],["de",40.30],["amanhã",40.40],["é",40.88]];
+      const OFF = [[5.4, 6.9], [6.9, 9.2], [13.48, 17.47], [35.3, 37.42], [40.3, END]]; // telas cheias / frases que já estão na tela
+      const off = (t) => OFF.some(([a, b]) => t >= a - 0.01 && t < b);
+      const chunks = []; let cur = [];
+      WORDS.forEach((w, i) => {
+        cur.push(i);
+        const nx = WORDS[i + 1], gap = nx ? nx[1] - w[1] : 9;
+        if (cur.length === 3 || /[.,?!]$/.test(w[0]) || gap > 0.6 || (nx && /^[A-ZÀ-Ú]/.test(nx[0]) && nx[0] !== "Matter") || (nx && off(nx[1]) !== off(w[1]))) { chunks.push(cur); cur = []; }
+      });
+      if (cur.length) chunks.push(cur);
+      const capRoot = document.getElementById("captions");
+      chunks.forEach((idxs, ci) => {
+        const t0 = WORDS[idxs[0]][1];
+        if (off(t0)) return;
+        const nxt = chunks[ci + 1] ? WORDS[chunks[ci + 1][0]][1] : END;
+        const t1 = Math.min(nxt, WORDS[idxs[idxs.length - 1]][1] + 0.9);
+        const d = document.createElement("div"); d.className = "cap"; d.id = "cap" + ci;
+        idxs.forEach((wi, k) => {
+          const s = document.createElement("span"); s.className = "cw"; s.id = "cw" + wi;
+          s.textContent = WORDS[wi][0].replace(/[.,]$/, "") + (k < idxs.length - 1 ? " " : ""); d.appendChild(s);
+        });
+        capRoot.appendChild(d);
+        tl.set(d, { opacity: 1 }, q(t0));
+        tl.fromTo(d, { y: 16, filter: "blur(8px)" }, { y: 0, filter: "blur(0px)", duration: 0.16, ease: "power2.out", immediateRender: false }, q(t0));
+        tl.set(d, { opacity: 0 }, q(t1));
+        idxs.forEach((wi, k) => {
+          const ws = WORDS[wi][1], we = k < idxs.length - 1 ? WORDS[idxs[k + 1]][1] : t1;
+          tl.set("#cw" + wi, { color: "#6f95ff" }, q(ws));
+          if (k < idxs.length - 1) tl.set("#cw" + wi, { color: "#ffffff" }, q(we));
+        });
+      });
+
+      tl.set({}, {}, q(END));
+      window.__timelines = window.__timelines || {};
+      window.__timelines["reels"] = tl;
+    })();
+  </script>
+</div>
+</body>
+</html>

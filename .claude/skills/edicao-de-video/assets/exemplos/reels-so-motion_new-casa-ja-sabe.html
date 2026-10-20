@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<style>
+  /* Reels New Sistemas Inteligentes — "Sua casa já sabe o que você vai fazer". 1080×1920, 25 s, só motion.
+     Zona segura: nada importante acima de y=250, abaixo de y≈1700 nem nos ~140 px da direita. */
+  @font-face { font-family: "Poppins"; src: url("fonts/poppins-500.woff2") format("woff2"); font-weight: 500; font-display: block; }
+  @font-face { font-family: "Poppins"; src: url("fonts/poppins-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+  @font-face { font-family: "Poppins"; src: url("fonts/poppins-800.woff2") format("woff2"); font-weight: 800; font-display: block; }
+  @font-face { font-family: "Poppins"; src: url("fonts/poppins-300-italic.woff2") format("woff2"); font-weight: 300; font-style: italic; font-display: block; }
+
+  :root { --acc: #dcae1f; --bg: #0e1307; --ink: #1a2309; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); font-family: "Poppins", sans-serif; color: #fff; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+  #grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.045) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.045) 2px, transparent 2px); background-size: 72px 72px; }
+  #sky { position: absolute; inset: 0; opacity: 0; }
+  #glow { position: absolute; left: -300px; top: 380px; width: 1680px; height: 1300px; border-radius: 50%; background: radial-gradient(closest-side, rgba(220,174,31,0.20), rgba(220,174,31,0)); }
+
+  .scene { position: absolute; inset: 0; opacity: 0; }
+  .w { display: inline-block; white-space: pre; }
+  .lead { font-weight: 300; font-style: italic; font-size: 48px; letter-spacing: -0.5px; opacity: 0.9; }
+  .big { font-weight: 800; font-size: 112px; line-height: 1.02; letter-spacing: -5px; }
+  .acc { color: var(--acc); }
+  .clock { position: absolute; left: 90px; top: 440px; display: flex; align-items: baseline; gap: 22px; }
+  .clock .t { font-weight: 800; font-size: 150px; letter-spacing: -7px; line-height: 1; font-variant-numeric: tabular-nums; }
+  .clock .p { font-weight: 300; font-style: italic; font-size: 44px; opacity: 0.85; }
+  .bar { position: absolute; left: 90px; top: 620px; width: 760px; height: 10px; border-radius: 5px; background: rgba(255,255,255,0.14); overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 0; background: var(--acc); border-radius: 5px; box-shadow: 0 0 14px rgba(220,174,31,0.8); }
+  .art { position: absolute; left: 90px; top: 700px; width: 760px; height: 520px; border-radius: 40px; background: rgba(255,255,255,0.05); border: 3px dashed rgba(255,255,255,0.35); overflow: hidden; }
+  .txt { position: absolute; left: 90px; top: 1270px; width: 800px; }
+  .txt .l { font-weight: 300; font-style: italic; font-size: 46px; opacity: 0.9; }
+  .txt .b { font-weight: 800; font-size: 86px; line-height: 1.04; letter-spacing: -3.5px; margin-top: 6px; }
+  .chip { display: inline-flex; align-items: center; gap: 14px; padding: 12px 26px 14px; border-radius: 18px; background: #f3f4f7; color: #1d2029; font-weight: 700; font-size: 38px; letter-spacing: -1px;
+          box-shadow: 0 6px 0 #b9bdc8, 0 14px 28px rgba(0,0,0,0.4); }
+  .card { position: absolute; inset: 0; background: var(--acc); opacity: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; color: var(--ink);
+          background-image: linear-gradient(rgba(0,0,0,0.07) 2px, transparent 2px), linear-gradient(90deg, rgba(0,0,0,0.07) 2px, transparent 2px); background-size: 72px 72px; }
+  .spk { position: absolute; width: 54px; height: 54px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.8)); }
+  #brand { position: absolute; left: 0; width: 1080px; top: 255px; display: flex; justify-content: center; opacity: 0; }
+  #brand img { width: 120px; height: 120px; filter: drop-shadow(0 6px 18px rgba(0,0,0,0.5)); }
+  #brand span { font-weight: 300; font-style: italic; letter-spacing: 0; text-transform: none; font-size: 32px; opacity: 0.85; }
+</style>
+</head>
+<body>
+<div id="stage" data-composition-id="reels" data-start="0" data-duration="25" data-fps="30" data-width="1080" data-height="1920">
+  <div id="grid"></div>
+  <div id="sky"></div>
+  <div id="glow"></div>
+  <div class="clip" id="fx" data-start="0" data-duration="25" data-track-index="2"></div>
+
+  <audio id="bgm" src="music/bgm.wav" data-start="0" data-duration="25" data-track-index="9" data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0,"v":0},{"t":0.6,"v":0.5},{"t":18.2,"v":0.5},{"t":18.5,"v":0.25},{"t":21.0,"v":0.25},{"t":21.4,"v":0.55},{"t":24.2,"v":0.55},{"t":25,"v":0}]}]}'></audio>
+  <!-- SFX:BEGIN -->
+  <audio id="sfx00" src="sfx/whoosh-short.mp3" data-start="0.1333" data-duration="0.57" data-track-index="10" data-volume="0.3"></audio>
+  <audio id="sfx01" src="sfx/impact-bass-1.mp3" data-start="0.1333" data-duration="2.12" data-track-index="11" data-volume="0.3"></audio>
+  <audio id="sfx02" src="sfx/click-soft.mp3" data-start="1.0000" data-duration="0.37" data-track-index="12" data-volume="0.3"></audio>
+  <audio id="sfx03" src="sfx/sparkle.mp3" data-start="1.8000" data-duration="1.80" data-track-index="13" data-volume="0.3"></audio>
+  <audio id="sfx04" src="sfx/whoosh.mp3" data-start="3.2000" data-duration="0.57" data-track-index="14" data-volume="0.3"></audio>
+  <audio id="sfx05" src="sfx/whoosh-short.mp3" data-start="3.8000" data-duration="0.57" data-track-index="15" data-volume="0.25"></audio>
+  <audio id="sfx06" src="sfx/ping.mp3" data-start="4.9000" data-duration="1.32" data-track-index="10" data-volume="0.3"></audio>
+  <audio id="sfx07" src="sfx/whoosh.mp3" data-start="7.2000" data-duration="0.57" data-track-index="11" data-volume="0.3"></audio>
+  <audio id="sfx08" src="sfx/click.mp3" data-start="8.1000" data-duration="0.37" data-track-index="12" data-volume="0.4"></audio>
+  <audio id="sfx09" src="sfx/click.mp3" data-start="8.3333" data-duration="0.37" data-track-index="13" data-volume="0.4"></audio>
+  <audio id="sfx10" src="sfx/click.mp3" data-start="8.6000" data-duration="0.37" data-track-index="14" data-volume="0.4"></audio>
+  <audio id="sfx11" src="sfx/click-soft.mp3" data-start="9.0000" data-duration="0.37" data-track-index="15" data-volume="0.45"></audio>
+  <audio id="sfx12" src="sfx/whoosh.mp3" data-start="10.8000" data-duration="0.57" data-track-index="10" data-volume="0.3"></audio>
+  <audio id="sfx13" src="sfx/ping.mp3" data-start="13.9000" data-duration="1.32" data-track-index="11" data-volume="0.3"></audio>
+  <audio id="sfx14" src="sfx/whoosh.mp3" data-start="14.8000" data-duration="0.57" data-track-index="12" data-volume="0.3"></audio>
+  <audio id="sfx15" src="sfx/sparkle.mp3" data-start="15.2000" data-duration="1.80" data-track-index="13" data-volume="0.3"></audio>
+  <audio id="sfx16" src="sfx/pop.mp3" data-start="16.4000" data-duration="0.72" data-track-index="14" data-volume="0.28"></audio>
+  <audio id="sfx17" src="sfx/pop.mp3" data-start="16.6333" data-duration="0.72" data-track-index="15" data-volume="0.28"></audio>
+  <audio id="sfx18" src="sfx/whoosh-short.mp3" data-start="18.7000" data-duration="0.57" data-track-index="10" data-volume="0.3"></audio>
+  <audio id="sfx19" src="sfx/impact-bass-1.mp3" data-start="19.7000" data-duration="2.12" data-track-index="11" data-volume="0.45"></audio>
+  <audio id="sfx20" src="sfx/whoosh.mp3" data-start="21.2000" data-duration="0.57" data-track-index="12" data-volume="0.3"></audio>
+  <audio id="sfx21" src="sfx/impact-bass-1.mp3" data-start="21.6667" data-duration="2.12" data-track-index="13" data-volume="0.35"></audio>
+  <audio id="sfx22" src="sfx/pop.mp3" data-start="22.4000" data-duration="0.72" data-track-index="14" data-volume="0.3"></audio>
+  <!-- SFX:END -->
+
+  <script src="vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      const q = (s) => Math.round(s * 30) / 30;
+      const fx = document.getElementById("fx");
+      const el = (h) => { const t = document.createElement("template"); t.innerHTML = h.trim(); return t.content.firstChild; };
+      const add = (h) => { const e = el(h); fx.appendChild(e); return e; };
+      const STAR = '<svg viewBox="0 0 24 24" width="100%" height="100%"><path fill="#fff" d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z"/></svg>';
+      const hidden = [];
+      const IN = (sel, t, o = {}) => { hidden.push(sel); tl.fromTo(sel, { opacity: 0, filter: "blur(16px)", scale: o.scale ?? 1.14, y: o.y ?? 0 },
+        { opacity: 1, filter: "blur(0px)", scale: 1, y: 0, duration: o.d ?? 0.3, ease: "power3.out", immediateRender: false }, q(t)); };
+      const sceneIn = (s, t) => { tl.set(s, { opacity: 1 }, q(t)); tl.fromTo(s, { x: 140, filter: "blur(12px)" }, { x: 0, filter: "blur(0px)", duration: 0.35, ease: "power3.out", immediateRender: false }, q(t)); };
+      const sceneOut = (s, t) => tl.to(s, { opacity: 0, x: -140, filter: "blur(12px)", duration: 0.25, ease: "power2.in" }, q(t - 0.25));
+      const words = (txt, id) => txt.split(" ").map((w, k) => '<span class="w' + (w.startsWith("*") ? " acc" : "") + '" id="' + id + k + '">' + w.replace("*", "") + ' </span>').join("");
+      const sayWords = (txt, id, t0, step = 0.11, o = {}) => txt.split(" ").forEach((_, k) => IN("#" + id + k, t0 + k * step, o));
+      const brand = add('<div id="brand"><img src="logo.png" alt="New Sistemas Inteligentes" /></div>');
+      tl.to(brand, { opacity: 0.9, duration: 0.5 }, 3.4);
+
+      // ── 0 · gancho ──
+      const s0 = add('<div class="scene" id="s0"><div style="position:absolute;left:90px;top:640px;width:900px">'
+        + '<div class="big" id="h1">' + words("Sua casa já sabe", "h1w") + '</div>'
+        + '<div class="lead" id="h2" style="margin-top:22px;font-size:64px">' + words("o que você *vai *fazer.", "h2w") + '</div>'
+        + '<div id="cur" style="width:14px;height:110px;background:var(--acc);margin-top:30px;box-shadow:0 0 18px rgba(220,174,31,.9)"></div></div>'
+        + '<div class="spk" style="left:820px;top:560px">' + STAR + '</div></div>');
+      tl.set(s0, { opacity: 1 }, 0);
+      sayWords("Sua casa já sabe", "h1w", 0.15, 0.16, { scale: 1.3 });
+      sayWords("o que você *vai *fazer.", "h2w", 1.0, 0.13);
+      tl.fromTo("#cur", { opacity: 1 }, { opacity: 0, duration: 0.25, yoyo: true, repeat: 7, ease: "steps(1)" }, 0);
+      tl.fromTo("#s0 .spk", { opacity: 0, scale: 0.2, rotation: -90 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.4, ease: "back.out(3)", immediateRender: false }, q(1.8));
+      hidden.push("#s0 .spk");
+      sceneOut(s0, 3.2);
+
+      // helper de cena "hora do dia"
+      function moment(id, t0, t1, time, period, pct, artHTML, lead, boldTxt) {
+        const s = add('<div class="scene" id="' + id + '">'
+          + '<div class="clock"><div class="t" id="' + id + '-t">' + time + '</div><div class="p" id="' + id + '-p">' + period + '</div></div>'
+          + '<div class="bar"><i id="' + id + '-bar"></i></div>'
+          + '<div class="art" id="' + id + '-art">' + artHTML + '</div>'
+          + '<div class="txt"><div class="l" id="' + id + '-l">' + lead + '</div><div class="b" id="' + id + '-b">' + words(boldTxt, id + "-bw") + '</div></div></div>');
+        sceneIn(s, t0);
+        IN("#" + id + "-t", t0 + 0.15, { scale: 1.4 }); IN("#" + id + "-p", t0 + 0.4);
+        tl.fromTo("#" + id + "-bar", { width: (pct[0]) + "%" }, { width: pct[1] + "%", duration: 0.8, ease: "power2.out", immediateRender: false }, q(t0 + 0.2));
+        IN("#" + id + "-art", t0 + 0.35, { scale: 0.92, blur: 8 });
+        IN("#" + id + "-l", t0 + 0.9);
+        sayWords(boldTxt, id + "-bw", t0 + 1.25, 0.1);
+        sceneOut(s, t1);
+        return s;
+      }
+
+      // ── 1 · 06:30 cortina abre + luz 30% ──
+      moment("s1", 3.2, 7.2, "06:30", "acordou", [0, 27],
+        '<div id="sun" style="position:absolute;left:290px;top:120px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,#ffd27a,#ff9f2e);box-shadow:0 0 90px rgba(255,181,71,.9)"></div>'
+        + '<div style="position:absolute;left:40px;top:40px;right:40px;height:330px;border:6px solid rgba(255,255,255,.8);border-radius:16px"></div>'
+        + '<div id="cL" style="position:absolute;left:46px;top:46px;width:334px;height:318px;background:repeating-linear-gradient(90deg,#2a3142 0 34px,#20263a 34px 52px)"></div>'
+        + '<div id="cR" style="position:absolute;left:380px;top:46px;width:334px;height:318px;background:repeating-linear-gradient(90deg,#2a3142 0 34px,#20263a 34px 52px)"></div>'
+        + '<div style="position:absolute;left:40px;bottom:40px;display:flex;align-items:center;gap:20px"><div class="chip">💡 luz</div><div style="width:330px;height:22px;border-radius:11px;background:rgba(255,255,255,.18);overflow:hidden"><i id="lum" style="display:block;height:100%;width:0;background:var(--acc);border-radius:11px"></i></div><div id="lumn" style="font-weight:800;font-size:44px">0%</div></div>',
+        "a cortina abre devagar", "e a *luz acende em *30%");
+      tl.fromTo("#cL", { x: 0 }, { x: -290, duration: 1.6, ease: "power2.inOut", immediateRender: false }, q(3.8));
+      tl.fromTo("#cR", { x: 0 }, { x: 290, duration: 1.6, ease: "power2.inOut", immediateRender: false }, q(3.8));
+      tl.fromTo("#sun", { y: 120 }, { y: 0, duration: 1.8, ease: "power2.out", immediateRender: false }, q(3.8));
+      tl.fromTo("#sky", { opacity: 0, background: "radial-gradient(ellipse at 50% 30%, rgba(220,174,31,.22), transparent 60%)" }, { opacity: 1, duration: 1.2, immediateRender: false }, q(4.0));
+      tl.to("#sky", { opacity: 0, duration: 0.3 }, q(6.95));
+      (function () { const o = { v: 0 }; tl.to(o, { v: 30, duration: 0.9, ease: "power2.out", onUpdate: () => { document.getElementById("lumn").textContent = Math.round(o.v) + "%"; document.getElementById("lum").style.width = (o.v / 100 * 100) + "%"; } }, q(4.9)); })();
+
+      // ── 2 · 07:10 saiu de casa → tudo desliga + tranca ──
+      const TOG = (id, label) => '<div style="display:flex;align-items:center;gap:22px"><div class="chip" style="width:250px">' + label + '</div><div id="' + id + '" style="position:relative;width:150px;height:80px;border-radius:40px;background:var(--acc)"><div class="kn" style="position:absolute;top:8px;left:78px;width:64px;height:64px;border-radius:32px;background:#fff"></div></div></div>';
+      moment("s2", 7.2, 10.8, "07:10", "saiu de casa", [27, 30],
+        '<div style="position:absolute;left:50px;top:50px;display:flex;flex-direction:column;gap:26px">' + TOG("tg1", "💡 luzes") + TOG("tg2", "📺 TV") + TOG("tg3", "❄️ ar") + '</div>'
+        + '<svg id="lock" style="position:absolute;right:60px;top:110px" width="200" height="260" viewBox="0 0 100 130"><path id="shk" d="M28 58 V36 a22 22 0 0 1 44 0 V58" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round"/><rect x="14" y="56" width="72" height="62" rx="14" fill="var(--acc)"/><circle cx="50" cy="84" r="8" fill="#11141c"/></svg>',
+        "você saiu?", "tudo *desliga e a *porta *tranca");
+      [["#tg1", 8.1], ["#tg2", 8.35], ["#tg3", 8.6]].forEach(([s, t]) => {
+        tl.to(s, { backgroundColor: "rgba(255,255,255,0.2)", duration: 0.2 }, q(t));
+        tl.to(s + " .kn", { x: -70, duration: 0.2, ease: "power2.out" }, q(t));
+      });
+      tl.fromTo("#shk", { y: -16 }, { y: 0, duration: 0.25, ease: "back.out(3)", immediateRender: false }, q(9.0));
+
+      // ── 3 · 18:45 chegando → ar já em 23° ──
+      moment("s3", 10.8, 14.8, "18:45", "a caminho", [30, 78],
+        '<svg style="position:absolute;left:0;top:0" width="760" height="520" viewBox="0 0 760 520"><path id="route" d="M80 440 C 200 300, 300 420, 420 300 S 560 160, 600 150" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="8" stroke-dasharray="4 18" stroke-linecap="round"/>'
+        + '<g transform="translate(600,140)"><path d="M-60 10 L0 -45 L60 10 V70 H-60 Z" fill="var(--acc)"/><rect x="-14" y="30" width="28" height="40" fill="#11141c"/></g>'
+        + '<g id="pin"><path d="M0 0 C-26 -30 -26 -62 0 -62 C26 -62 26 -30 0 0 Z" fill="#fff"/><circle cy="-40" r="10" fill="#11141c"/></g></svg>'
+        + '<div style="position:absolute;left:50px;top:40px;display:flex;align-items:baseline;gap:10px"><div class="chip">❄️ ar</div><div id="temp" style="font-weight:800;font-size:120px;letter-spacing:-5px;margin-left:16px">28°</div></div>',
+        "você ainda está chegando", "e o *ar já *está em *23°");
+      (function () {
+        const path = document.getElementById("route"); const L = path.getTotalLength(); const o = { p: 0 };
+        const place = () => { const pt = path.getPointAtLength(L * o.p); document.getElementById("pin").setAttribute("transform", "translate(" + pt.x + "," + pt.y + ")"); };
+        place();
+        tl.to(o, { p: 1, duration: 2.6, ease: "power1.inOut", onUpdate: place }, q(11.3));
+        const tp = { v: 28 }; tl.to(tp, { v: 23, duration: 1.6, ease: "power2.out", onUpdate: () => { document.getElementById("temp").textContent = Math.round(tp.v) + "°"; } }, q(12.2));
+      })();
+
+      // ── 4 · 22:30 modo noite ──
+      moment("s4", 14.8, 18.4, "22:30", "hora de dormir", [78, 94],
+        '<svg id="moon" style="position:absolute;left:290px;top:60px" width="180" height="180" viewBox="0 0 100 100"><path d="M64 10 A42 42 0 1 0 90 66 A34 34 0 1 1 64 10 Z" fill="#e8ecff"/></svg>'
+        + '<div class="spk" style="left:140px;top:70px;width:34px;height:34px">' + STAR + '</div><div class="spk" style="left:600px;top:140px;width:28px;height:28px">' + STAR + '</div>'
+        + '<div style="position:absolute;left:50px;bottom:50px;display:flex;gap:18px"><div class="chip" id="n1">💡 apagam</div><div class="chip" id="n2">🔒 alarme on</div></div>',
+        "modo noite", "luzes *apagam e o *alarme *ativa");
+      tl.fromTo("#moon", { rotation: -40, scale: 0.6, opacity: 0 }, { rotation: 0, scale: 1, opacity: 1, duration: 0.6, ease: "back.out(2)", immediateRender: false }, q(15.2));
+      hidden.push("#moon", "#n1", "#n2");
+      tl.fromTo(["#n1", "#n2"], { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.3, stagger: 0.25, ease: "back.out(2)", immediateRender: false }, q(16.4));
+      tl.to("#glow", { opacity: 0.2, duration: 0.6 }, q(16.4)); tl.to("#glow", { opacity: 1, duration: 0.4 }, q(18.4));
+
+      // ── 5 · virada: não é mágica / é automação ──
+      const s5 = add('<div class="scene" id="s5" style="display:flex;align-items:center;justify-content:center;flex-direction:column">'
+        + '<div class="lead" id="m1" style="font-size:60px">não é</div><div class="big" id="m2" style="font-size:180px;letter-spacing:-9px">mágica.</div></div>');
+      tl.set(s5, { opacity: 1 }, q(18.4)); IN("#m1", 18.45); IN("#m2", 18.7, { scale: 1.5, d: 0.35 });
+      tl.set(s5, { opacity: 0 }, q(19.7));
+      const c = add('<div class="card" id="s5b"><div class="lead" style="font-size:66px;opacity:1">é</div><div style="font-weight:800;font-size:150px;letter-spacing:-7px;line-height:1" id="auto">automação.</div>'
+        + '<div class="spk" style="left:150px;top:640px;filter:none"><svg viewBox="0 0 24 24" width="100%" height="100%"><path fill="#11141c" d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z"/></svg></div></div>');
+      tl.set(c, { opacity: 1 }, q(19.7)); tl.set(c, { opacity: 0 }, q(21.2));
+      tl.fromTo("#auto", { scale: 1.4 }, { scale: 1, duration: 0.3, ease: "power3.out", immediateRender: false }, q(19.7));
+      tl.to("#brand", { opacity: 0, duration: 0.1 }, q(18.3));
+
+      // ── 6 · CTA ──
+      const s6 = add('<div class="scene" id="s6" style="display:flex;flex-direction:column;align-items:center;text-align:center">'
+        + '<div class="lead" id="c1" style="margin-top:440px;font-size:56px">quer uma casa assim?</div>'
+        + '<img id="c2" src="logo.png" style="margin-top:30px;width:340px;height:340px;filter:drop-shadow(0 18px 50px rgba(0,0,0,.55))" />'
+        + '<div id="c3" style="margin-top:18px;font-weight:800;font-size:58px;letter-spacing:-2px">New Sistemas Inteligentes</div>'
+        + '<div id="c4" style="margin-top:56px;display:inline-flex;align-items:center;gap:16px;padding:22px 46px 26px;border-radius:60px;background:var(--acc);color:var(--ink);font-weight:800;font-size:52px;letter-spacing:-1.5px">chama no direct ✉️</div>'
+        + '<div class="lead" id="c5" style="margin-top:34px;font-size:40px">automação e tecnologia de ambientes</div></div>');
+      sceneIn(s6, 21.2);
+      IN("#c1", 21.35); IN("#c2", 21.65, { scale: 1.5 }); IN("#c3", 21.95); IN("#c4", 22.4, { scale: 0.8 }); IN("#c5", 22.8, { scale: 1 });
+      tl.fromTo("#c4", { scale: 1 }, { scale: 1.07, duration: 0.35, yoyo: true, repeat: 3, ease: "sine.inOut", immediateRender: false }, q(23.0));
+      tl.to("#brand", { opacity: 0, duration: 0.2 }, q(21.2));
+
+      gsap.set(hidden, { opacity: 0 });
+      tl.set({}, {}, 25);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["reels"] = tl;
+    })();
+  </script>
+</div>
+</body>
+</html>
