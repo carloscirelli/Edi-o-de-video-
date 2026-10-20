@@ -40,3 +40,11 @@
   `assets/vendor/gsap.min.js` desta skill. Nada de `<script src="https://...">` na composição.
 - Não há `Resultados\` nem caminhos do Windows: trabalhar numa pasta da sessão e entregar com `SendUserFile`.
 - Transcrição (Scribe/ElevenLabs) precisa de `ELEVENLABS_API_KEY` nas variáveis do ambiente.
+- Voz grátis na nuvem: Kokoro (`scripts/tts_kokoro.py`, modelo baixado do GitHub
+  `thewh1teagle/kokoro-onnx` release `model-files-v1.0`; `pip install kokoro-onnx soundfile`). Vozes pt-BR: `pm_alex`
+  (padrão), `pm_santa`, `pf_dora`. Marcas em grafia fonética no texto falado (Élan, Niú Sistemas, tátch, diréct).
+  Google/Microsoft TTS, Hugging Face e Whisper estão bloqueados aqui.
+- Trilha original sintetizada: `scripts/music_ambient.py <dur> <saida.wav>`. Fotos de produto com fundo branco:
+  `scripts/cutout_white.py`. Emoji no render: declarar `@font-face { font-family: "Noto Color Emoji"; src: local(...) }`
+  e pôr a fonte na pilha do body; emoji amarelo (💡🔒) some em pill dourada acesa.
+- Exemplo de Reels narrado no estilo das referências (notebook filmado): `videos/new-sistemas-elan/`.

@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<style>
+  /* Reels New Sistemas Inteligentes × ELAN — 1080×1920, 33 s, narrado.
+     Estilo das referências: animação numa tela de notebook "filmada" de perto, teclado embaixo, fundo escuro com
+     manchas de luz douradas, texto palavra por palavra no ritmo da voz, legenda fixa no topo.
+     Zona segura: nada importante acima de y=250, abaixo de y≈1700 nem nos ~140 px da direita. */
+  @font-face { font-family: "Poppins"; src: url("fonts/poppins-500.woff2") format("woff2"); font-weight: 500; font-display: block; }
+  @font-face { font-family: "Poppins"; src: url("fonts/poppins-700.woff2") format("woff2"); font-weight: 700; font-display: block; }
+  @font-face { font-family: "Poppins"; src: url("fonts/poppins-800.woff2") format("woff2"); font-weight: 800; font-display: block; }
+  @font-face { font-family: "Poppins"; src: url("fonts/poppins-300-italic.woff2") format("woff2"); font-weight: 300; font-style: italic; font-display: block; }
+
+  @font-face { font-family: "Noto Color Emoji"; src: local("Noto Color Emoji"); }
+  :root { --acc: #dcae1f; --acc2: #ffcf4a; --bg: #0e1307; --ink: #1a2309; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #050604; font-family: "Poppins", "Noto Color Emoji", sans-serif; color: #fff; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: radial-gradient(ellipse 120% 60% at 50% 45%, #15180c, #050604 70%); }
+
+  /* "câmera na mão": tudo dentro de #rig balança de leve */
+  #rig { position: absolute; left: -40px; top: -40px; width: 1160px; height: 2000px; }
+  #lap { position: absolute; left: 70px; top: 470px; width: 1020px; height: 1110px; perspective: 2400px; }
+  #lid { position: absolute; inset: 0; border-radius: 28px; background: #0b0c0a; border: 3px solid #23251f; box-shadow: 0 30px 90px rgba(0,0,0,.8), inset 0 0 0 14px #070806;
+         transform: rotateX(5deg) rotateY(-3deg); transform-origin: 50% 100%; }
+  #scr { position: absolute; left: 22px; top: 22px; right: 22px; bottom: 46px; border-radius: 10px; overflow: hidden; background: var(--bg); }
+  #cam { position: absolute; left: 50%; top: 9px; width: 9px; height: 9px; margin-left: -4px; border-radius: 50%; background: #1d201b; }
+  #brandbar { position: absolute; left: 0; right: 0; bottom: 12px; text-align: center; font-weight: 500; font-size: 17px; letter-spacing: 1px; color: #5b5e55; }
+  #deck { position: absolute; left: 0; top: 1600px; width: 1160px; height: 520px; perspective: 900px; }
+  #kb { position: absolute; left: 30px; top: 0; width: 1100px; height: 520px; transform: rotateX(52deg); transform-origin: 50% 0; border-radius: 30px; background: linear-gradient(#1a1b17, #0d0e0b);
+        display: grid; grid-template-columns: repeat(14, 1fr); gap: 12px; padding: 26px 30px; }
+  #kb i { display: block; border-radius: 9px; background: #0a0b09; box-shadow: inset 0 -3px 0 #000, 0 0 10px rgba(220,174,31,.10); position: relative; }
+  #kb i::after { content: ""; position: absolute; left: 30%; top: 30%; width: 26%; height: 8%; background: rgba(255,228,160,.55); border-radius: 2px; filter: blur(.5px); }
+  #glare { position: absolute; inset: 0; background: linear-gradient(115deg, rgba(255,255,255,.07) 0%, rgba(255,255,255,0) 32%, rgba(255,255,255,0) 70%, rgba(255,255,255,.04) 100%); pointer-events: none; }
+  #grain { position: absolute; inset: 0; background: url("img/grain.png"); opacity: .35; mix-blend-mode: overlay; }
+  #vig { position: absolute; inset: 0; background: radial-gradient(ellipse 80% 70% at 50% 45%, transparent 55%, rgba(0,0,0,.65)); }
+
+  /* manchas de luz desfocadas dentro da tela */
+  .blob { position: absolute; border-radius: 50%; }
+  #b1 { left: -160px; top: -120px; width: 820px; height: 820px; background: radial-gradient(closest-side, rgba(255,170,40,.55), rgba(255,170,40,0)); }
+  #b2 { left: 360px; top: 420px; width: 760px; height: 760px; background: radial-gradient(closest-side, rgba(220,174,31,.45), rgba(220,174,31,0)); }
+  #b3 { left: -100px; top: 640px; width: 600px; height: 600px; background: radial-gradient(closest-side, rgba(255,120,20,.30), rgba(255,120,20,0)); }
+
+  /* legenda fixa no topo (por cima do vídeo, como nas referências) */
+  #cap { position: absolute; left: 0; width: 1080px; top: 262px; text-align: center; text-shadow: 0 4px 18px rgba(0,0,0,.7); }
+  #cap .c1 { font-weight: 700; font-size: 50px; line-height: 1.18; letter-spacing: -1.2px; }
+  #cap .c2 { font-weight: 500; font-size: 30px; margin-top: 8px; opacity: .9; }
+  #capB { opacity: 0; }
+
+  .scene { position: absolute; inset: 0; opacity: 0; }
+  .w { display: inline-block; white-space: pre; }
+  .lead { font-weight: 300; font-style: italic; font-size: 44px; letter-spacing: -0.5px; opacity: .92; }
+  .big { font-weight: 800; font-size: 96px; line-height: 1.02; letter-spacing: -4.5px; }
+  .acc { color: var(--acc2); text-shadow: 0 0 30px rgba(255,190,50,.55); }
+  .ctr { position: absolute; left: 0; right: 0; text-align: center; }
+  .pill { display: inline-flex; align-items: center; gap: 12px; padding: 14px 28px 16px; border-radius: 60px; font-weight: 700; font-size: 34px; letter-spacing: -1px; color: #fff;
+          background: linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.05)); border: 2px solid rgba(255,214,120,.45);
+          box-shadow: 0 0 22px rgba(255,190,50,.35), inset 0 1px 0 rgba(255,255,255,.35); }
+  .pill.on { background: linear-gradient(180deg, #ffd65a, #d79a12); color: var(--ink); border-color: #ffe39a; box-shadow: 0 0 40px rgba(255,190,50,.8), inset 0 2px 0 rgba(255,255,255,.6); }
+  .glass { border-radius: 34px; background: linear-gradient(160deg, rgba(255,255,255,.14), rgba(255,255,255,.03)); border: 2px solid rgba(255,255,255,.18);
+           box-shadow: 0 30px 70px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.3); }
+  .tag { display: inline-block; padding: 8px 22px 10px; border: 3px dashed rgba(255,214,120,.8); border-radius: 16px; font-weight: 700; font-size: 30px; letter-spacing: -.5px; color: var(--acc2); }
+  .prod { position: absolute; filter: drop-shadow(0 30px 50px rgba(0,0,0,.6)) drop-shadow(0 0 40px rgba(255,190,50,.25)); }
+  .card { position: absolute; inset: 0; opacity: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; color: var(--ink);
+          background: var(--acc); background-image: linear-gradient(rgba(0,0,0,0.07) 2px, transparent 2px), linear-gradient(90deg, rgba(0,0,0,0.07) 2px, transparent 2px); background-size: 64px 64px; }
+  #cursor { position: absolute; left: 0; top: 0; width: 56px; height: 56px; opacity: 0; filter: drop-shadow(0 4px 8px rgba(0,0,0,.6)); }
+  .ring { position: absolute; border-radius: 50%; border: 5px solid rgba(90,190,255,.9); box-shadow: 0 0 30px rgba(90,190,255,.8); opacity: 0; }
+</style>
+</head>
+<body>
+<div id="stage" data-composition-id="reels" data-start="0" data-duration="33" data-fps="30" data-width="1080" data-height="1920">
+  <div id="rig">
+    <div id="deck"><div id="kb"></div></div>
+    <div id="lap"><div id="lid"><div id="cam"></div>
+      <div id="scr">
+        <div class="blob" id="b1"></div><div class="blob" id="b2"></div><div class="blob" id="b3"></div>
+        <div class="clip" id="fx" data-start="0" data-duration="33" data-track-index="2"></div>
+        <div id="glare"></div>
+      </div>
+      <div id="brandbar">MacBook Air</div>
+    </div></div>
+  </div>
+  <div id="vig"></div>
+  <div id="grain"></div>
+  <div id="cap">
+    <div id="capA"><div class="c1">Sua casa inteira<br />respondendo a um toque🤯</div><div class="c2">(automação ELAN com a New Sistemas)</div></div>
+    <div id="capB" style="position:absolute;left:0;right:0;top:0"><div class="c1">Quer uma casa assim?<br />Chama no direct👇</div></div>
+  </div>
+
+  <audio id="vo" src="vo/vo.wav" data-start="0" data-duration="33" data-track-index="8" data-volume="1"></audio>
+  <audio id="bgm" src="music/bgm.wav" data-start="0" data-duration="33" data-track-index="9" data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0,"v":0},{"t":0.4,"v":0.12},{"t":24.7,"v":0.12},{"t":25.0,"v":0.2},{"t":25.2,"v":0.12},{"t":31.6,"v":0.12},{"t":31.9,"v":0.3},{"t":32.6,"v":0.3},{"t":33,"v":0}]}]}'></audio>
+  <!-- SFX:BEGIN -->
+  <audio id="sfx00" src="sfx/whoosh-short.mp3" data-start="0.1" data-duration="0.57" data-track-index="10" data-volume="0.25"></audio>
+  <audio id="sfx01" src="sfx/click.mp3" data-start="2.55" data-duration="0.37" data-track-index="11" data-volume="0.35"></audio>
+  <audio id="sfx02" src="sfx/whoosh.mp3" data-start="3.25" data-duration="0.57" data-track-index="12" data-volume="0.25"></audio>
+  <audio id="sfx03" src="sfx/pop.mp3" data-start="4.35" data-duration="0.72" data-track-index="13" data-volume="0.2"></audio>
+  <audio id="sfx04" src="sfx/whoosh.mp3" data-start="7.65" data-duration="0.57" data-track-index="14" data-volume="0.25"></audio>
+  <audio id="sfx05" src="sfx/sparkle.mp3" data-start="10.2" data-duration="1.80" data-track-index="15" data-volume="0.2"></audio>
+  <audio id="sfx06" src="sfx/whoosh.mp3" data-start="12.75" data-duration="0.57" data-track-index="10" data-volume="0.25"></audio>
+  <audio id="sfx07" src="sfx/whoosh.mp3" data-start="16.85" data-duration="0.57" data-track-index="11" data-volume="0.25"></audio>
+  <audio id="sfx08" src="sfx/notification.mp3" data-start="18.0" data-duration="1.2" data-track-index="12" data-volume="0.22"></audio>
+  <audio id="sfx09" src="sfx/whoosh.mp3" data-start="20.85" data-duration="0.57" data-track-index="13" data-volume="0.25"></audio>
+  <audio id="sfx10" src="sfx/impact-bass-1.mp3" data-start="25.0" data-duration="2.12" data-track-index="14" data-volume="0.35"></audio>
+  <audio id="sfx11" src="sfx/whoosh-short.mp3" data-start="26.62" data-duration="0.57" data-track-index="15" data-volume="0.25"></audio>
+  <audio id="sfx12" src="sfx/whoosh.mp3" data-start="28.75" data-duration="0.57" data-track-index="10" data-volume="0.25"></audio>
+  <audio id="sfx13" src="sfx/pop.mp3" data-start="30.6" data-duration="0.72" data-track-index="11" data-volume="0.25"></audio>
+  <!-- SFX:END -->
+
+  <script src="vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      const q = (s) => Math.round(s * 30) / 30;
+      const fx = document.getElementById("fx");
+      const el = (h) => { const t = document.createElement("template"); t.innerHTML = h.trim(); return t.content.firstChild; };
+      const add = (h, parent) => { const e = el(h); (parent || fx).appendChild(e); return e; };
+      const hidden = [];
+      const IN = (sel, t, o = {}) => { hidden.push(sel); tl.fromTo(sel, { opacity: 0, filter: "blur(" + (o.blur ?? 16) + "px)", scale: o.scale ?? 1.14, y: o.y ?? 0 },
+        { opacity: 1, filter: "blur(0px)", scale: 1, y: 0, duration: o.d ?? 0.3, ease: o.ease ?? "power3.out", immediateRender: false }, q(t)); };
+      const sceneIn = (s, t) => { tl.set(s, { opacity: 1 }, q(t)); tl.fromTo(s, { scale: 1.06, filter: "blur(14px)" }, { scale: 1, filter: "blur(0px)", duration: 0.35, ease: "power3.out", immediateRender: false }, q(t)); };
+      const sceneOut = (s, t) => tl.to(s, { opacity: 0, scale: 0.96, filter: "blur(14px)", duration: 0.22, ease: "power2.in" }, q(t - 0.22));
+
+      // ── tempos da narração (vo/vo.json) e tempo estimado de cada palavra (peso = nº de letras + pausa na pontuação)
+      const LINES = [
+        [0.35, 3.083, "Imagine a sua casa inteira respondendo a um toque."],
+        [3.433, 7.397, "Com a ELAN, luz, clima, música, câmeras e segurança ficam num só lugar."],
+        [7.847, 12.506, "Tudo começa no controlador ELAN. Ele é o cérebro que conecta cada sistema da casa."],
+        [12.956, 16.696, "No painel touch, você ajusta a luz, o clima, e vê quem está na porta."],
+        [17.046, 20.712, "Com a campainha com vídeo, você atende a visita de onde estiver."],
+        [21.062, 24.69, "E pelo aplicativo, no celular ou no tablet, a casa vai com você."],
+        [25.19, 26.604, "Não é só tecnologia."],
+        [26.804, 28.469, "É a sua casa, do seu jeito."],
+        [28.969, 31.534, "New Sistemas Inteligentes. Chama no direct."],
+      ];
+      const norm = (s) => s.toLowerCase().replace(/[.,!?]/g, "");
+      const WT = LINES.map(([a, b, txt]) => {
+        const ws = txt.split(" "); const wt = ws.map((w) => w.replace(/[.,!?]/g, "").length + 1.5 + (/[.,!?]$/.test(w) ? 3 : 0));
+        const tot = wt.reduce((x, y) => x + y, 0); let acc = 0;
+        return ws.map((w, k) => { const t = a + (b - a) * acc / tot; acc += wt[k]; return { w: norm(w), t }; });
+      });
+      // at(linha, "palavra", nª ocorrência) → tempo em que a palavra começa a ser dita
+      const at = (i, w, n = 0) => { const hits = WT[i].filter((x) => x.w === norm(w)); return hits[n] ? hits[n].t : LINES[i][0]; };
+      // frase palavra por palavra: cada palavra entra quando é dita; *palavra = destaque
+      const say = (i, txt, id, from = 0) => {
+        let html = ""; const seen = {};
+        txt.split(" ").forEach((w, k) => {
+          const raw = w.replace("*", ""); const key = norm(raw); seen[key] = (seen[key] ?? -1) + 1;
+          html += '<span class="w' + (w.startsWith("*") ? " acc" : "") + '" id="' + id + k + '">' + raw + ' </span>';
+          const t = at(i, raw, seen[key] + from); setTimeout0.push(["#" + id + k, t - 0.04]);
+        });
+        return html;
+      };
+      const setTimeout0 = []; const flush = (o = {}) => { setTimeout0.splice(0).forEach(([s, t]) => IN(s, t, o)); };
+
+      // teclado
+      const kb = document.getElementById("kb");
+      for (let k = 0; k < 14 * 5; k++) kb.appendChild(document.createElement("i"));
+
+      // câmera na mão, manchas respirando, granulação
+      tl.fromTo("#rig", { x: 0, y: 0, rotation: 0 }, { x: 6, y: -5, rotation: 0.25, duration: 2.1, ease: "sine.inOut", yoyo: true, repeat: 15 }, 0);
+      tl.fromTo("#lap", { scale: 1 }, { scale: 1.035, duration: 33, ease: "none" }, 0);
+      tl.fromTo("#b1", { x: 0, y: 0 }, { x: 160, y: 120, duration: 5.5, ease: "sine.inOut", yoyo: true, repeat: 5 }, 0);
+      tl.fromTo("#b2", { x: 0, y: 0 }, { x: -200, y: -160, duration: 6.5, ease: "sine.inOut", yoyo: true, repeat: 4 }, 0);
+      tl.fromTo("#b3", { x: 0, y: 0, scale: 1 }, { x: 140, y: -60, scale: 1.3, duration: 4.5, ease: "sine.inOut", yoyo: true, repeat: 7 }, 0);
+      (function () { const g = { v: 0 }; const gr = document.getElementById("grain");
+        tl.to(g, { v: 990, duration: 33, ease: "none", onUpdate: () => { const k = Math.floor(g.v); gr.style.backgroundPosition = ((k * 73) % 256) + "px " + ((k * 151) % 256) + "px"; } }, 0); })();
+
+      const CUR = '<svg id="cursor" viewBox="0 0 24 24"><path d="M3 2 L3 20 L8 15 L11.5 22 L14.5 20.6 L11 14 L18 14 Z" fill="#fff" stroke="#111" stroke-width="1.3" stroke-linejoin="round"/></svg>';
+
+      // ── 0 · gancho: "Imagine a sua casa inteira respondendo a um toque." ──
+      const s0 = add('<div class="scene" id="s0">'
+        + '<div class="ctr" style="top:250px"><div class="lead" style="font-size:52px">' + say(0, "Imagine", "s0a") + '</div>'
+        + '<div class="big" style="margin-top:6px">' + say(0, "a sua casa", "s0b") + '<br />' + say(0, "*inteira", "s0c") + '</div>'
+        + '<div class="lead" style="margin-top:14px">' + say(0, "respondendo a um", "s0d") + '</div></div>'
+        + '<div class="ctr" style="top:700px"><div class="pill" id="s0p" style="font-size:44px;padding:20px 46px 22px">✨ toque</div></div>' + CUR + '</div>');
+      tl.set(s0, { opacity: 1 }, 0);
+      flush({ scale: 1.3 });
+      IN("#s0p", at(0, "toque") - 0.35, { scale: 0.7, ease: "back.out(2.2)" });
+      hidden.push("#cursor");
+      tl.fromTo("#cursor", { opacity: 0, x: 760, y: 980 }, { opacity: 1, x: 520, y: 760, duration: 0.5, ease: "power2.out", immediateRender: false }, q(at(0, "toque") - 0.45));
+      tl.to("#cursor", { scale: 0.8, duration: 0.08, yoyo: true, repeat: 1 }, q(at(0, "toque") + 0.1));
+      tl.set("#s0p", { attr: { class: "pill on" } }, q(at(0, "toque") + 0.12));
+      tl.fromTo("#s0p", { scale: 1 }, { scale: 1.12, duration: 0.15, yoyo: true, repeat: 1, ease: "power2.out", immediateRender: false }, q(at(0, "toque") + 0.12));
+      sceneOut(s0, 3.4);
+
+      // ── 1 · "Com a ELAN, luz, clima, música, câmeras e segurança ficam num só lugar." ──
+      const P = (id, txt) => '<div class="pill" id="' + id + '">' + txt + '</div>';
+      const s1 = add('<div class="scene" id="s1">'
+        + '<div class="ctr" style="top:150px"><div class="lead">' + say(1, "Com a", "s1a") + '</div>'
+        + '<img id="s1logo" src="img/elan-logo-branco.png" style="width:640px;margin-top:20px;filter:drop-shadow(0 0 30px rgba(255,190,50,.35))" /></div>'
+        + '<div style="position:absolute;left:40px;right:40px;top:520px;display:flex;flex-wrap:wrap;gap:20px;justify-content:center">'
+        + P("p1", "💡 luz") + P("p2", "🌡️ clima") + P("p3", "🎵 música") + P("p4", "📹 câmeras") + P("p5", "🔒 segurança") + '</div>'
+        + '<div class="ctr" style="top:760px"><div class="lead">' + say(1, "ficam", "s1b") + '</div><div class="big">' + say(1, "num *só lugar.", "s1c") + '</div></div></div>');
+      sceneIn(s1, 3.4);
+      flush();
+      IN("#s1logo", at(1, "elan") - 0.1, { scale: 1.4, d: 0.4 });
+      [["#p1", "luz"], ["#p2", "clima"], ["#p3", "música"], ["#p4", "câmeras"], ["#p5", "segurança"]].forEach(([s, w]) => {
+        IN(s, at(1, w) - 0.05, { scale: 0.6, ease: "back.out(2.4)", d: 0.32 });
+        tl.set(s, { attr: { class: "pill on" } }, q(at(1, w) + 0.1)); tl.set(s, { attr: { class: "pill" } }, q(at(1, w) + 0.5));
+      });
+      sceneOut(s1, 7.75);
+
+      // ── 2 · controlador: "Tudo começa no controlador ELAN. Ele é o cérebro que conecta cada sistema da casa." ──
+      const s2 = add('<div class="scene" id="s2">'
+        + '<div class="ctr" style="top:70px"><div class="lead">' + say(2, "Tudo começa no", "s2a") + '</div><div class="tag" id="s2tag" style="margin-top:12px">controlador ELAN</div></div>'
+        + '<svg id="s2net" style="position:absolute;left:0;top:0" width="976" height="1042" viewBox="0 0 976 1042">'
+        + ['M488 470 L130 290', 'M488 470 L846 290', 'M488 470 L110 690', 'M488 470 L866 690'].map((d, k) => '<path id="ln' + k + '" d="' + d + '" fill="none" stroke="rgba(255,214,120,.8)" stroke-width="4" stroke-dasharray="10 12" />').join("")
+        + '</svg>'
+        + '<div class="pill" id="n0" style="position:absolute;left:30px;top:250px;font-size:28px">💡</div><div class="pill" id="n1" style="position:absolute;left:820px;top:250px;font-size:28px">🎵</div>'
+        + '<div class="pill" id="n2" style="position:absolute;left:20px;top:650px;font-size:28px">🌡️</div><div class="pill" id="n3" style="position:absolute;left:830px;top:650px;font-size:28px">🔒</div>'
+        + '<img class="prod" id="s2img" src="img/controladores.png" style="left:228px;top:290px;width:520px" />'
+        + '<div class="ctr" style="top:720px"><div class="lead">' + say(2, "ele é o", "s2b") + '</div><div class="big" style="font-size:120px">' + say(2, "*cérebro", "s2c") + '</div>'
+        + '<div class="lead" style="font-size:38px">' + say(2, "que conecta cada sistema da casa.", "s2d") + '</div></div></div>');
+      sceneIn(s2, 7.75);
+      flush();
+      IN("#s2tag", at(2, "controlador") - 0.05, { scale: 0.7, ease: "back.out(2.2)" });
+      IN("#s2img", 8.0, { scale: 0.85, d: 0.5, y: 40 });
+      tl.fromTo("#s2img", { y: 0 }, { y: -14, duration: 1.2, yoyo: true, repeat: 3, ease: "sine.inOut", immediateRender: false }, q(8.5));
+      [0, 1, 2, 3].forEach((k) => {
+        const t = at(2, "conecta") + k * 0.12;
+        hidden.push("#ln" + k);
+        tl.fromTo("#ln" + k, { opacity: 0, strokeDashoffset: 300 }, { opacity: 1, strokeDashoffset: 0, duration: 0.5, ease: "power2.out", immediateRender: false }, q(t));
+        IN("#n" + k, t + 0.25, { scale: 0.5, ease: "back.out(2.6)" });
+      });
+      sceneOut(s2, 12.85);
+
+      // ── 3 · painel touch ──
+      const s3 = add('<div class="scene" id="s3">'
+        + '<div style="position:absolute;left:60px;top:80px"><div class="lead">' + say(3, "No painel", "s3a") + '</div><div class="big" style="font-size:110px">' + say(3, "*touch,", "s3b") + '</div></div>'
+        + '<img class="prod" id="s3img" src="img/painel.png" style="left:330px;top:150px;width:640px" />'
+        + '<div style="position:absolute;left:60px;top:690px;display:flex;flex-direction:column;gap:18px;align-items:flex-start">'
+        + '<div class="lead" style="font-size:38px">' + say(3, "você ajusta", "s3c") + '</div>'
+        + '<div style="display:flex;gap:16px">' + P("t1", "💡 a luz") + P("t2", "🌡️ o clima") + '</div>'
+        + '<div class="pill" id="t3">🚪 e vê quem está na porta</div></div></div>');
+      sceneIn(s3, 12.85);
+      flush();
+      IN("#s3img", 13.05, { scale: 0.85, d: 0.5, y: 50 });
+      tl.fromTo("#s3img", { rotation: 0 }, { rotation: -2, duration: 1.6, yoyo: true, repeat: 1, ease: "sine.inOut", immediateRender: false }, q(13.6));
+      [["#t1", "luz"], ["#t2", "clima"], ["#t3", "vê"]].forEach(([s, w]) => { IN(s, at(3, w) - 0.15, { scale: 0.6, ease: "back.out(2.4)" }); tl.set(s, { attr: { class: "pill on" } }, q(at(3, w) + 0.15)); });
+      sceneOut(s3, 16.95);
+
+      // ── 4 · campainha com vídeo ──
+      const s4 = add('<div class="scene" id="s4">'
+        + '<img class="prod" id="s4img" src="img/campainha.png" style="left:80px;top:120px;width:330px" />'
+        + '<div class="ring" id="s4r1" style="left:155px;top:690px;width:180px;height:180px"></div>'
+        + '<div style="position:absolute;left:460px;top:150px;width:470px"><div class="lead" style="font-size:38px">' + say(4, "Com a campainha", "s4a") + '</div>'
+        + '<div class="big" style="font-size:84px;letter-spacing:-3.5px">' + say(4, "com *vídeo,", "s4b") + '</div>'
+        + '<div class="glass" id="s4n" style="margin-top:40px;padding:24px 28px;display:flex;gap:18px;align-items:center"><div style="font-size:52px">🔔</div><div><div style="font-weight:700;font-size:30px">Alguém na porta</div><div style="font-weight:500;font-size:22px;opacity:.75">agora • toque para atender</div></div></div>'
+        + '<div class="lead" style="margin-top:40px;font-size:38px">' + say(4, "você atende a visita", "s4c") + '</div>'
+        + '<div class="big" style="font-size:76px;letter-spacing:-3px">' + say(4, "de *onde *estiver.", "s4d") + '</div></div></div>');
+      sceneIn(s4, 16.95);
+      flush();
+      IN("#s4img", 17.1, { scale: 0.85, d: 0.5, y: 50 });
+      IN("#s4n", 18.0, { scale: 0.7, ease: "back.out(2)", y: 20 });
+      hidden.push("#s4r1");
+      tl.fromTo("#s4r1", { opacity: 0.9, scale: 0.8 }, { opacity: 0, scale: 1.6, duration: 0.9, repeat: 3, ease: "power2.out", immediateRender: false }, q(17.6));
+      sceneOut(s4, 20.95);
+
+      // ── 5 · aplicativo ──
+      const s5 = add('<div class="scene" id="s5">'
+        + '<div class="ctr" style="top:60px"><div class="lead">' + say(5, "E pelo", "s5a") + '</div><div class="big">' + say(5, "*aplicativo,", "s5b") + '</div></div>'
+        + '<img class="prod" id="s5img" src="img/app.png" style="left:270px;top:250px;width:440px" />'
+        + '<div class="pill" id="d1" style="position:absolute;left:40px;top:420px">📱 celular</div><div class="pill" id="d2" style="position:absolute;left:720px;top:560px">💻 tablet</div>'
+        + '<div class="ctr" style="top:810px"><div class="lead" style="font-size:40px">' + say(5, "a casa", "s5c") + '</div><div class="big" style="font-size:88px">' + say(5, "vai com *você.", "s5d") + '</div></div></div>');
+      sceneIn(s5, 20.95);
+      flush();
+      IN("#s5img", 21.15, { scale: 0.85, d: 0.5, y: 50 });
+      tl.fromTo("#s5img", { y: 0 }, { y: -16, duration: 1.3, yoyo: true, repeat: 2, ease: "sine.inOut", immediateRender: false }, q(21.7));
+      IN("#d1", at(5, "celular") - 0.1, { scale: 0.6, ease: "back.out(2.4)" }); IN("#d2", at(5, "tablet") - 0.1, { scale: 0.6, ease: "back.out(2.4)" });
+      sceneOut(s5, 25.05);
+
+      // ── 6 · cartão dourado: "Não é só tecnologia." ──
+      const s6 = add('<div class="card" id="s6"><div class="lead" style="font-size:58px;opacity:1">' + say(6, "Não é só", "s6a") + '</div>'
+        + '<div style="font-weight:800;font-size:128px;letter-spacing:-6px;line-height:1">' + say(6, "tecnologia.", "s6b") + '</div></div>');
+      tl.set(s6, { opacity: 1 }, q(25.05)); tl.set(s6, { opacity: 0 }, q(26.7));
+      flush({ scale: 1.4 });
+      tl.to(["#b1", "#b2", "#b3"], { opacity: 0, duration: 0.1 }, q(25.0)); tl.to(["#b1", "#b2", "#b3"], { opacity: 1, duration: 0.5 }, q(26.7));
+
+      // ── 7 · "É a sua casa, do seu jeito." ──
+      const s7 = add('<div class="scene" id="s7"><div class="ctr" style="top:330px"><div class="lead" style="font-size:56px">' + say(7, "É a sua casa,", "s7a") + '</div>'
+        + '<div class="big" style="font-size:130px;letter-spacing:-6px">' + say(7, "do seu *jeito.", "s7b") + '</div></div></div>');
+      tl.set(s7, { opacity: 1 }, q(26.7));
+      flush({ scale: 1.35 });
+      sceneOut(s7, 28.85);
+
+      // ── 8 · CTA ──
+      const s8 = add('<div class="scene" id="s8"><div class="ctr" style="top:70px">'
+        + '<img id="c1" src="img/new-logo.png" style="width:380px;height:380px;filter:drop-shadow(0 18px 50px rgba(0,0,0,.6)) drop-shadow(0 0 40px rgba(220,174,31,.35))" />'
+        + '<div id="c2" style="margin-top:18px;font-weight:800;font-size:60px;letter-spacing:-2px">New Sistemas Inteligentes</div>'
+        + '<div class="lead" id="c3" style="font-size:34px;margin-top:6px">automação e tecnologia de ambientes</div>'
+        + '<div id="c4" style="margin-top:46px;display:inline-flex;align-items:center;gap:16px;padding:22px 50px 26px;border-radius:60px;background:linear-gradient(180deg,#ffd65a,#d79a12);color:var(--ink);font-weight:800;font-size:54px;letter-spacing:-1.5px;box-shadow:0 0 50px rgba(255,190,50,.6)">chama no direct ✉️</div>'
+        + '<div id="c5" style="margin-top:60px;display:flex;align-items:center;justify-content:center;gap:18px"><span class="lead" style="font-size:30px">automação com</span><img src="img/elan-logo-branco.png" style="width:230px" /></div>'
+        + '</div></div>');
+      sceneIn(s8, 28.85);
+      IN("#c1", 28.95, { scale: 1.4, d: 0.45 }); IN("#c2", at(8, "sistemas") - 0.1); IN("#c3", at(8, "inteligentes") + 0.2, { scale: 1 });
+      IN("#c4", at(8, "chama") - 0.05, { scale: 0.7, ease: "back.out(2.2)" }); IN("#c5", 31.0, { scale: 1 });
+      tl.fromTo("#c4", { scale: 1 }, { scale: 1.07, duration: 0.35, yoyo: true, repeat: 3, ease: "sine.inOut", immediateRender: false }, q(31.0));
+
+      // legenda do topo troca no CTA
+      tl.to("#capA", { opacity: 0, filter: "blur(10px)", duration: 0.25 }, q(28.75));
+      tl.fromTo("#capB", { opacity: 0, filter: "blur(10px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.3, immediateRender: false }, q(28.95));
+
+      gsap.set(hidden, { opacity: 0 });
+      tl.set({}, {}, 33);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["reels"] = tl;
+    })();
+  </script>
+</div>
+</body>
+</html>
