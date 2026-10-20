@@ -32,3 +32,11 @@
   (`REQUESTS_CA_BUNDLE`/`SSL_CERT_FILE`). Fora do wrapper, setar essas variáveis.
 - Disco C: quase cheio (~24 GB livres): apagar temporários grandes que você criou (ex.: `segs/` antigos) quando
   não forem mais úteis, avisando.
+
+## Sessão na nuvem (Claude Code pelo celular/web)
+- O hook `.claude/hooks/session-start.sh` instala o HyperFrames CLI, o Chrome de render e as skills `hyperframes-*`
+  (aqui sem o prefixo `hyperframes:`). FFmpeg 6, Python 3 com numpy e Node 22 já vêm no container.
+- O Chrome do render não acessa CDN (jsdelivr bloqueado): usar sempre `vendor/gsap.min.js` local — cópia em
+  `assets/vendor/gsap.min.js` desta skill. Nada de `<script src="https://...">` na composição.
+- Não há `Resultados\` nem caminhos do Windows: trabalhar numa pasta da sessão e entregar com `SendUserFile`.
+- Transcrição (Scribe/ElevenLabs) precisa de `ELEVENLABS_API_KEY` nas variáveis do ambiente.

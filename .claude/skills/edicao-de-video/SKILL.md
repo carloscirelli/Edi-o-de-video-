@@ -41,7 +41,7 @@ Carregue as skills do plugin quando for usá-las: `hyperframes:hyperframes` (map
   seguro e as legendas: Reels falado (`reels-falado_desafio-dia09.html`), tutorial 16:9
   (`youtube-tutorial_nexo-lampada.html` + `youtube-tutorial_make_comp.py`), Reels só motion
   (`reels-so-motion_new-casa-ja-sabe.html`), Stories (`stories_indico-nao-indico.html`). Copie também
-  `assets/fontes/` (Poppins) e `vendor/gsap.min.js` / `sfx/` de um projeto existente.
+  `assets/fontes/` (Poppins), `assets/vendor/gsap.min.js` e `sfx/` de um projeto existente.
 - Estilo: Poppins com letras apertadas; frase pequena em itálico puxando palavra grande em negrito; CAIXA ALTA com
   brilho; pills 3D; caixas tracejadas; números gigantes; telas cheias curtas de impacto. Uma cor de destaque da
   marca (`references/marcas.md`). Texto fora do rosto e dentro da zona segura do formato.
