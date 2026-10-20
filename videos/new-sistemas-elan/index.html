@@ -18,34 +18,16 @@
   html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #050604; font-family: "Poppins", "Noto Color Emoji", sans-serif; color: #fff; }
   #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: radial-gradient(ellipse 120% 60% at 50% 45%, #15180c, #050604 70%); }
 
-  /* "câmera na mão": tudo dentro de #rig balança de leve */
-  #rig { position: absolute; left: -40px; top: -40px; width: 1160px; height: 2000px; }
-  #lap { position: absolute; left: 70px; top: 470px; width: 1020px; height: 1110px; perspective: 2400px; }
-  #lid { position: absolute; inset: 0; border-radius: 28px; background: #0b0c0a; border: 3px solid #23251f; box-shadow: 0 30px 90px rgba(0,0,0,.8), inset 0 0 0 14px #070806;
-         transform: rotateX(5deg) rotateY(-3deg); transform-origin: 50% 100%; }
-  #scr { position: absolute; left: 22px; top: 22px; right: 22px; bottom: 46px; border-radius: 10px; overflow: hidden; background: var(--bg); }
-  #cam { position: absolute; left: 50%; top: 9px; width: 9px; height: 9px; margin-left: -4px; border-radius: 50%; background: #1d201b; }
-  #brandbar { position: absolute; left: 0; right: 0; bottom: 12px; text-align: center; font-weight: 500; font-size: 17px; letter-spacing: 1px; color: #5b5e55; }
-  #deck { position: absolute; left: 0; top: 1600px; width: 1160px; height: 520px; perspective: 900px; }
-  #kb { position: absolute; left: 30px; top: 0; width: 1100px; height: 520px; transform: rotateX(52deg); transform-origin: 50% 0; border-radius: 30px; background: linear-gradient(#1a1b17, #0d0e0b);
-        display: grid; grid-template-columns: repeat(14, 1fr); gap: 12px; padding: 26px 30px; }
-  #kb i { display: block; border-radius: 9px; background: #0a0b09; box-shadow: inset 0 -3px 0 #000, 0 0 10px rgba(220,174,31,.10); position: relative; }
-  #kb i::after { content: ""; position: absolute; left: 30%; top: 30%; width: 26%; height: 8%; background: rgba(255,228,160,.55); border-radius: 2px; filter: blur(.5px); }
-  #glare { position: absolute; inset: 0; background: linear-gradient(115deg, rgba(255,255,255,.07) 0%, rgba(255,255,255,0) 32%, rgba(255,255,255,0) 70%, rgba(255,255,255,.04) 100%); pointer-events: none; }
-  #grain { position: absolute; inset: 0; background: url("img/grain.png"); opacity: .35; mix-blend-mode: overlay; }
-  #vig { position: absolute; inset: 0; background: radial-gradient(ellipse 80% 70% at 50% 45%, transparent 55%, rgba(0,0,0,.65)); }
-
+  /* animação em tela cheia (o que rodava DENTRO da tela nas referências) */
+  #scr { position: absolute; inset: 0; overflow: hidden; background: radial-gradient(ellipse 120% 80% at 50% 40%, #141a0a, var(--bg) 70%); }
+  #content { position: absolute; left: 52px; top: 540px; width: 976px; height: 1042px; transform: scale(1.08); transform-origin: 50% 0; }
+  #brand { position: absolute; left: 0; width: 1080px; top: 255px; display: flex; justify-content: center; opacity: 0; }
+  #brand img { width: 120px; height: 120px; filter: drop-shadow(0 6px 18px rgba(0,0,0,.5)); }
   /* manchas de luz desfocadas dentro da tela */
   .blob { position: absolute; border-radius: 50%; }
-  #b1 { left: -160px; top: -120px; width: 820px; height: 820px; background: radial-gradient(closest-side, rgba(255,170,40,.55), rgba(255,170,40,0)); }
-  #b2 { left: 360px; top: 420px; width: 760px; height: 760px; background: radial-gradient(closest-side, rgba(220,174,31,.45), rgba(220,174,31,0)); }
-  #b3 { left: -100px; top: 640px; width: 600px; height: 600px; background: radial-gradient(closest-side, rgba(255,120,20,.30), rgba(255,120,20,0)); }
-
-  /* legenda fixa no topo (por cima do vídeo, como nas referências) */
-  #cap { position: absolute; left: 0; width: 1080px; top: 262px; text-align: center; text-shadow: 0 4px 18px rgba(0,0,0,.7); }
-  #cap .c1 { font-weight: 700; font-size: 50px; line-height: 1.18; letter-spacing: -1.2px; }
-  #cap .c2 { font-weight: 500; font-size: 30px; margin-top: 8px; opacity: .9; }
-  #capB { opacity: 0; }
+  #b1 { left: -260px; top: 120px; width: 1200px; height: 1200px; background: radial-gradient(closest-side, rgba(255,170,40,.55), rgba(255,170,40,0)); }
+  #b2 { left: 320px; top: 820px; width: 1100px; height: 1100px; background: radial-gradient(closest-side, rgba(220,174,31,.45), rgba(220,174,31,0)); }
+  #b3 { left: -200px; top: 1150px; width: 900px; height: 900px; background: radial-gradient(closest-side, rgba(255,120,20,.30), rgba(255,120,20,0)); }
 
   .scene { position: absolute; inset: 0; opacity: 0; }
   .w { display: inline-block; white-space: pre; }
@@ -69,22 +51,10 @@
 </head>
 <body>
 <div id="stage" data-composition-id="reels" data-start="0" data-duration="33" data-fps="30" data-width="1080" data-height="1920">
-  <div id="rig">
-    <div id="deck"><div id="kb"></div></div>
-    <div id="lap"><div id="lid"><div id="cam"></div>
-      <div id="scr">
-        <div class="blob" id="b1"></div><div class="blob" id="b2"></div><div class="blob" id="b3"></div>
-        <div class="clip" id="fx" data-start="0" data-duration="33" data-track-index="2"></div>
-        <div id="glare"></div>
-      </div>
-      <div id="brandbar">MacBook Air</div>
-    </div></div>
-  </div>
-  <div id="vig"></div>
-  <div id="grain"></div>
-  <div id="cap">
-    <div id="capA"><div class="c1">Sua casa inteira<br />respondendo a um toque🤯</div><div class="c2">(automação ELAN com a New Sistemas)</div></div>
-    <div id="capB" style="position:absolute;left:0;right:0;top:0"><div class="c1">Quer uma casa assim?<br />Chama no direct👇</div></div>
+  <div id="scr">
+    <div class="blob" id="b1"></div><div class="blob" id="b2"></div><div class="blob" id="b3"></div>
+    <div id="brand"><img src="img/new-logo.png" alt="New Sistemas Inteligentes" /></div>
+    <div id="content"><div class="clip" id="fx" data-start="0" data-duration="33" data-track-index="2" style="position:absolute;inset:0"></div></div>
   </div>
 
   <audio id="vo" src="vo/vo.wav" data-start="0" data-duration="33" data-track-index="8" data-volume="1"></audio>
@@ -152,18 +122,11 @@
       };
       const setTimeout0 = []; const flush = (o = {}) => { setTimeout0.splice(0).forEach(([s, t]) => IN(s, t, o)); };
 
-      // teclado
-      const kb = document.getElementById("kb");
-      for (let k = 0; k < 14 * 5; k++) kb.appendChild(document.createElement("i"));
-
-      // câmera na mão, manchas respirando, granulação
-      tl.fromTo("#rig", { x: 0, y: 0, rotation: 0 }, { x: 6, y: -5, rotation: 0.25, duration: 2.1, ease: "sine.inOut", yoyo: true, repeat: 15 }, 0);
-      tl.fromTo("#lap", { scale: 1 }, { scale: 1.035, duration: 33, ease: "none" }, 0);
       tl.fromTo("#b1", { x: 0, y: 0 }, { x: 160, y: 120, duration: 5.5, ease: "sine.inOut", yoyo: true, repeat: 5 }, 0);
       tl.fromTo("#b2", { x: 0, y: 0 }, { x: -200, y: -160, duration: 6.5, ease: "sine.inOut", yoyo: true, repeat: 4 }, 0);
       tl.fromTo("#b3", { x: 0, y: 0, scale: 1 }, { x: 140, y: -60, scale: 1.3, duration: 4.5, ease: "sine.inOut", yoyo: true, repeat: 7 }, 0);
-      (function () { const g = { v: 0 }; const gr = document.getElementById("grain");
-        tl.to(g, { v: 990, duration: 33, ease: "none", onUpdate: () => { const k = Math.floor(g.v); gr.style.backgroundPosition = ((k * 73) % 256) + "px " + ((k * 151) % 256) + "px"; } }, 0); })();
+      tl.to("#brand", { opacity: 0.95, duration: 0.5 }, 0.4);
+      tl.to("#brand", { opacity: 0, duration: 0.1 }, q(25.0)); tl.to("#brand", { opacity: 0.95, duration: 0.3 }, q(26.7)); tl.to("#brand", { opacity: 0, duration: 0.2 }, q(28.7));
 
       const CUR = '<svg id="cursor" viewBox="0 0 24 24"><path d="M3 2 L3 20 L8 15 L11.5 22 L14.5 20.6 L11 14 L18 14 Z" fill="#fff" stroke="#111" stroke-width="1.3" stroke-linejoin="round"/></svg>';
 
@@ -271,7 +234,7 @@
 
       // ── 6 · cartão dourado: "Não é só tecnologia." ──
       const s6 = add('<div class="card" id="s6"><div class="lead" style="font-size:58px;opacity:1">' + say(6, "Não é só", "s6a") + '</div>'
-        + '<div style="font-weight:800;font-size:128px;letter-spacing:-6px;line-height:1">' + say(6, "tecnologia.", "s6b") + '</div></div>');
+        + '<div style="font-weight:800;font-size:128px;letter-spacing:-6px;line-height:1">' + say(6, "tecnologia.", "s6b") + '</div></div>', document.getElementById("scr"));
       tl.set(s6, { opacity: 1 }, q(25.05)); tl.set(s6, { opacity: 0 }, q(26.7));
       flush({ scale: 1.4 });
       tl.to(["#b1", "#b2", "#b3"], { opacity: 0, duration: 0.1 }, q(25.0)); tl.to(["#b1", "#b2", "#b3"], { opacity: 1, duration: 0.5 }, q(26.7));
@@ -295,10 +258,6 @@
       IN("#c1", 28.95, { scale: 1.4, d: 0.45 }); IN("#c2", at(8, "sistemas") - 0.1); IN("#c3", at(8, "inteligentes") + 0.2, { scale: 1 });
       IN("#c4", at(8, "chama") - 0.05, { scale: 0.7, ease: "back.out(2.2)" }); IN("#c5", 31.0, { scale: 1 });
       tl.fromTo("#c4", { scale: 1 }, { scale: 1.07, duration: 0.35, yoyo: true, repeat: 3, ease: "sine.inOut", immediateRender: false }, q(31.0));
-
-      // legenda do topo troca no CTA
-      tl.to("#capA", { opacity: 0, filter: "blur(10px)", duration: 0.25 }, q(28.75));
-      tl.fromTo("#capB", { opacity: 0, filter: "blur(10px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.3, immediateRender: false }, q(28.95));
 
       gsap.set(hidden, { opacity: 0 });
       tl.set({}, {}, 33);
