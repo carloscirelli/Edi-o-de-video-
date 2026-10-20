@@ -9,6 +9,13 @@ Tudo o que foi aprendido editando os vídeos deste usuário: o fluxo, o estilo q
 custaram retrabalho. Projeto em `C:\Users\lscir\Edição de video` (ler o `CLAUDE.md` de lá também — tem detalhes
 de ferramentas). Responder sempre em português.
 
+## Estilo padrão: as referências (ler `references/estilo-referencia.md` antes de tudo)
+O usuário pediu que **todo vídeo saia bem parecido com as três referências** em `assets/referencias/`: animação
+numa tela de notebook filmada de perto, fundo escuro com manchas de luz numa cor só, texto palavra por palavra no
+ritmo da narração, UI de IA (prompt, pills, cards de vidro), números gigantes, legenda fixa no topo e fecho com
+logo. Isso vale por cima dos formatos abaixo, salvo se ele pedir outra coisa. Voz: a dele ou de biblioteca —
+nunca a dos criadores das referências.
+
 ## Escolha o caminho
 
 | O usuário quer… | Caminho |
