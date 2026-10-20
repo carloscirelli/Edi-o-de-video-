@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <style>
-  /* Reels New Sistemas Inteligentes × ELAN — 1080×1920, 33 s, sem narração (música + efeitos).
+  /* Reels New Sistemas Inteligentes × Nice — 1080×1920, 33 s, sem narração (música + efeitos).
      Estilo das referências: animação numa tela de notebook "filmada" de perto, teclado embaixo, fundo escuro com
      manchas de luz douradas, texto palavra por palavra no ritmo da voz, legenda fixa no topo.
      Zona segura: nada importante acima de y=250, abaixo de y≈1700 nem nos ~140 px da direita. */
@@ -92,8 +92,8 @@
       // ── tempos da narração (vo/vo.json) e tempo estimado de cada palavra (peso = nº de letras + pausa na pontuação)
       const LINES = [
         [0.35, 3.083, "Imagine a sua casa inteira respondendo a um toque."],
-        [3.433, 7.397, "Com a ELAN, luz, clima, música, câmeras e segurança ficam num só lugar."],
-        [7.847, 12.506, "Tudo começa no controlador ELAN. Ele é o cérebro que conecta cada sistema da casa."],
+        [3.433, 7.397, "Com a Nice, luz, clima, música, câmeras e segurança ficam num só lugar."],
+        [7.847, 12.506, "Tudo começa no controlador Nice. Ele é o cérebro que conecta cada sistema da casa."],
         [12.956, 16.696, "No painel touch, você ajusta a luz, o clima, e vê quem está na porta."],
         [17.046, 20.712, "Com a campainha com vídeo, você atende a visita de onde estiver."],
         [21.062, 24.69, "E pelo aplicativo, no celular ou no tablet, a casa vai com você."],
@@ -145,26 +145,26 @@
       tl.fromTo("#s0p", { scale: 1 }, { scale: 1.12, duration: 0.15, yoyo: true, repeat: 1, ease: "power2.out", immediateRender: false }, q(at(0, "toque") + 0.12));
       sceneOut(s0, 3.4);
 
-      // ── 1 · "Com a ELAN, luz, clima, música, câmeras e segurança ficam num só lugar." ──
+      // ── 1 · "Com a Nice, luz, clima, música, câmeras e segurança ficam num só lugar." ──
       const P = (id, txt) => '<div class="pill" id="' + id + '">' + txt + '</div>';
       const s1 = add('<div class="scene" id="s1">'
         + '<div class="ctr" style="top:150px"><div class="lead">' + say(1, "Com a", "s1a") + '</div>'
-        + '<img id="s1logo" src="img/elan-logo-branco.png" style="width:640px;margin-top:20px;filter:drop-shadow(0 0 30px rgba(255,190,50,.35))" /></div>'
+        + '<img id="s1logo" src="img/nice-logo-branco.png" style="width:500px;margin-top:20px;filter:drop-shadow(0 0 30px rgba(255,190,50,.35))" /></div>'
         + '<div style="position:absolute;left:40px;right:40px;top:520px;display:flex;flex-wrap:wrap;gap:20px;justify-content:center">'
         + P("p1", "💡 luz") + P("p2", "🌡️ clima") + P("p3", "🎵 música") + P("p4", "📹 câmeras") + P("p5", "🔒 segurança") + '</div>'
         + '<div class="ctr" style="top:760px"><div class="lead">' + say(1, "ficam", "s1b") + '</div><div class="big">' + say(1, "num *só lugar.", "s1c") + '</div></div></div>');
       sceneIn(s1, 3.4);
       flush();
-      IN("#s1logo", at(1, "elan") - 0.1, { scale: 1.4, d: 0.4 });
+      IN("#s1logo", at(1, "nice") - 0.1, { scale: 1.4, d: 0.4 });
       [["#p1", "luz"], ["#p2", "clima"], ["#p3", "música"], ["#p4", "câmeras"], ["#p5", "segurança"]].forEach(([s, w]) => {
         IN(s, at(1, w) - 0.05, { scale: 0.6, ease: "back.out(2.4)", d: 0.32 });
         tl.set(s, { attr: { class: "pill on" } }, q(at(1, w) + 0.1)); tl.set(s, { attr: { class: "pill" } }, q(at(1, w) + 0.5));
       });
       sceneOut(s1, 7.75);
 
-      // ── 2 · controlador: "Tudo começa no controlador ELAN. Ele é o cérebro que conecta cada sistema da casa." ──
+      // ── 2 · controlador: "Tudo começa no controlador Nice. Ele é o cérebro que conecta cada sistema da casa." ──
       const s2 = add('<div class="scene" id="s2">'
-        + '<div class="ctr" style="top:70px"><div class="lead">' + say(2, "Tudo começa no", "s2a") + '</div><div class="tag" id="s2tag" style="margin-top:12px">controlador ELAN</div></div>'
+        + '<div class="ctr" style="top:70px"><div class="lead">' + say(2, "Tudo começa no", "s2a") + '</div><div class="tag" id="s2tag" style="margin-top:12px">controlador Nice</div></div>'
         + '<svg id="s2net" style="position:absolute;left:0;top:0" width="976" height="1042" viewBox="0 0 976 1042">'
         + ['M488 470 L130 290', 'M488 470 L846 290', 'M488 470 L110 690', 'M488 470 L866 690'].map((d, k) => '<path id="ln' + k + '" d="' + d + '" fill="none" stroke="rgba(255,214,120,.8)" stroke-width="4" stroke-dasharray="10 12" />').join("")
         + '</svg>'
@@ -251,7 +251,7 @@
         + '<div id="c2" style="margin-top:18px;font-weight:800;font-size:60px;letter-spacing:-2px">New Sistemas Inteligentes</div>'
         + '<div class="lead" id="c3" style="font-size:34px;margin-top:6px">automação e tecnologia de ambientes</div>'
         + '<div id="c4" style="margin-top:46px;display:inline-flex;align-items:center;gap:16px;padding:22px 50px 26px;border-radius:60px;background:linear-gradient(180deg,#ffd65a,#d79a12);color:var(--ink);font-weight:800;font-size:54px;letter-spacing:-1.5px;box-shadow:0 0 50px rgba(255,190,50,.6)">chama no direct ✉️</div>'
-        + '<div id="c5" style="margin-top:60px;display:flex;align-items:center;justify-content:center;gap:18px"><span class="lead" style="font-size:30px">automação com</span><img src="img/elan-logo-branco.png" style="width:230px" /></div>'
+        + '<div id="c5" style="margin-top:60px;display:flex;align-items:center;justify-content:center;gap:18px"><span class="lead" style="font-size:30px">automação com</span><img src="img/nice-logo-branco.png" style="width:150px" /></div>'
         + '</div></div>');
       sceneIn(s8, 28.85);
       IN("#c1", 28.95, { scale: 1.4, d: 0.45 }); IN("#c2", at(8, "sistemas") - 0.1); IN("#c3", at(8, "inteligentes") + 0.2, { scale: 1 });
